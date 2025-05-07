@@ -1,9 +1,32 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react"; // Added useEffect
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
+interface Template {
+  id: string;
+  name: string;
+  searchText: string;
+  replaceText: string;
+}
 
 export default function TextReplacer() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [originalText, setOriginalText] = useState("");
-  const [searchText, setSearchText] = useState("");
-  const [replaceText, setReplaceText] = useState("");
+  const [searchText, setSearchText] = useState(
+    location.state?.searchText || ""
+  );
+  const [replaceText, setReplaceText] = useState(
+    location.state?.replaceText || ""
+  );
+
+  // Effect to clear location state after loading it
+  useEffect(() => {
+    // Changed useState to useEffect
+    if (location.state?.searchText || location.state?.replaceText) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]); // Added dependencies
 
   const handleReplace = useCallback(() => {
     if (!originalText || !searchText) return;
@@ -24,6 +47,45 @@ export default function TextReplacer() {
         console.error("复制失败: ", err);
       });
   }, [originalText]);
+
+  const handleSaveTemplate = useCallback(() => {
+    if (!searchText.trim() && !replaceText.trim()) {
+      alert("查找文本和替换文本不能为空！");
+      return;
+    }
+    const templateName = prompt(
+      "请输入模板名称：",
+      `模版 ${new Date().toLocaleString()}`
+    );
+    if (!templateName) {
+      return;
+    }
+
+    const newTemplate: Template = {
+      id: Date.now().toString(),
+      name: templateName,
+      searchText,
+      replaceText,
+    };
+
+    try {
+      const existingTemplatesRaw = localStorage.getItem(
+        "textReplacerTemplates"
+      );
+      const existingTemplates: Template[] = existingTemplatesRaw
+        ? JSON.parse(existingTemplatesRaw)
+        : [];
+      existingTemplates.push(newTemplate);
+      localStorage.setItem(
+        "textReplacerTemplates",
+        JSON.stringify(existingTemplates)
+      );
+      alert("模板已保存！");
+    } catch (error) {
+      console.error("保存模板失败：", error);
+      alert("保存模板失败，请检查浏览器控制台。");
+    }
+  }, [searchText, replaceText]);
 
   return (
     <div className="container mx-auto p-4">
@@ -64,20 +126,32 @@ export default function TextReplacer() {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
+      <div className="flex flex-col sm:flex-row sm:space-y-2 md:space-y-0 sm:space-x-0 md:space-x-4 mb-4 items-center">
         <button
-          className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-2 sm:mb-0"
+          className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-2 sm:mb-0 md:mb-0"
           onClick={handleReplace}
         >
           替换内容
         </button>
         <button
-          className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mb-2 sm:mb-0 md:mb-0"
           onClick={handleCopy}
           disabled={!originalText}
         >
           复制结果
         </button>
+        <button
+          className="w-full sm:w-auto px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 mb-2 sm:mb-0 md:mb-0"
+          onClick={handleSaveTemplate}
+        >
+          保存为模版
+        </button>
+        <Link
+          to="/templates"
+          className="w-full sm:w-auto text-center px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+        >
+          管理模版
+        </Link>
       </div>
     </div>
   );
