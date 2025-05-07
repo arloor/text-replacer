@@ -258,22 +258,22 @@ export default function TextReplacer() {
 
       <div className="flex flex-col sm:flex-row sm:space-y-2 md:space-y-0 sm:space-x-0 md:space-x-4 mb-6 items-center">
         <button
-          className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-2 sm:mb-0 md:mb-0"
-          style={{ backgroundColor: "#90CAF9" }}
+          className="w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 text-base sm:text-sm bg-blue-500 text-white rounded hover:bg-blue-600 mb-3 sm:mb-0 md:mb-0"
+          // style={{ backgroundColor: "#90CAF9" }}
           onClick={handleReplace}
         >
           替换内容
         </button>
         <button
-          className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mb-2 sm:mb-0 md:mb-0"
-          style={{ backgroundColor: "#FFa500" }}
+          className="w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 text-base sm:text-sm bg-orange-400 text-white rounded hover:bg-green-600 mb-3 sm:mb-0 md:mb-0"
+          // style={{ backgroundColor: "#FFa500" }}
           onClick={handleCopy}
           disabled={!originalText}
         >
           复制结果
         </button>
         <button
-          className="w-full sm:w-auto px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 mb-2 sm:mb-0 md:mb-0"
+          className="w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 text-base sm:text-sm bg-purple-500 text-white rounded hover:bg-purple-600 mb-3 sm:mb-0 md:mb-0"
           style={{ backgroundColor: "#111111" }}
           onClick={handleSaveTemplate}
         >
@@ -331,14 +331,14 @@ export default function TextReplacer() {
                 <div className="flex justify-end space-x-2">
                   <button
                     onClick={() => handleLoadTemplate(template)}
-                    className="px-2 sm:px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs sm:text-sm"
-                    style={{ backgroundColor: "#90CAF9" }}
+                    className="px-4 sm:px-3 py-1 bg-blue-500 text-white rounded hover:bg-green-600 text-base sm:text-sm"
+                    // style={{ backgroundColor: "#90CAF9" }}
                   >
                     使用
                   </button>
                   <button
                     onClick={() => handleDeleteTemplate(template.id)}
-                    className="px-2 sm:px-3 py-1 bg-black text-white rounded hover:bg-red-600 text-xs sm:text-sm"
+                    className="px-4 sm:px-3 py-1 bg-black text-white rounded hover:bg-red-600 text-base sm:text-sm"
                   >
                     删除
                   </button>
