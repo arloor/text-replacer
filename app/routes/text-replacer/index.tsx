@@ -2,6 +2,12 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { MetaFunction } from "react-router";
 
+// 添加提示消息接口
+interface ToastMessage {
+  text: string;
+  type: 'success' | 'error';
+}
+
 interface Template {
   id: string;
   name: string;
@@ -46,6 +52,18 @@ export default function TextReplacer() {
   const [searchText, setSearchText] = useState("");
   const [replaceText, setReplaceText] = useState("");
   const [templates, setTemplates] = useState<Template[]>([]);
+  // 添加toast提示消息状态
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+
+  // 显示临时提示的函数
+  const showToast = useCallback((text: string, type: 'success' | 'error' = 'success') => {
+    setToast({ text, type });
+    
+    // 2.5秒后自动清除提示
+    setTimeout(() => {
+      setToast(null);
+    }, 2500);
+  }, []);
 
   // 加载保存的状态和模板
   useEffect(() => {
@@ -78,7 +96,8 @@ export default function TextReplacer() {
 
     const replaced = originalText.split(searchText).join(replaceText);
     setOriginalText(replaced);
-  }, [originalText, searchText, replaceText]);
+    showToast("替换完成！", "success");
+  }, [originalText, searchText, replaceText, showToast]);
 
   const handleCopy = useCallback(() => {
     if (!originalText) return;
@@ -88,7 +107,7 @@ export default function TextReplacer() {
       navigator.clipboard
         .writeText(originalText)
         .then(() => {
-          alert("已复制到剪贴板！");
+          showToast("已复制到剪贴板！", "success");
         })
         .catch((err) => {
           console.error("现代API复制失败: ", err);
@@ -99,7 +118,7 @@ export default function TextReplacer() {
       // 在不支持navigator.clipboard的环境中使用后备方法
       fallbackCopyToClipboard(originalText);
     }
-  }, [originalText]);
+  }, [originalText, showToast]);
 
   // 后备复制方法
   const fallbackCopyToClipboard = (text: string) => {
@@ -123,20 +142,20 @@ export default function TextReplacer() {
       document.body.removeChild(textArea);
 
       if (successful) {
-        alert("已复制到剪贴板！");
+        showToast("已复制到剪贴板！", "success");
       } else {
         console.error("fallback复制方法失败");
-        alert("复制失败，请手动复制文本。");
+        showToast("复制失败，请手动复制文本。", "error");
       }
     } catch (err) {
       console.error("fallback复制失败: ", err);
-      alert("复制失败，请手动复制文本。");
+      showToast("复制失败，请手动复制文本。", "error");
     }
   };
 
   const handleSaveTemplate = useCallback(() => {
     if (!searchText.trim() && !replaceText.trim()) {
-      alert("查找文本和替换文本不能为空！");
+      showToast("查找文本和替换文本不能为空！", "error");
       return;
     }
     const templateName = prompt(
@@ -161,17 +180,17 @@ export default function TextReplacer() {
         "textReplacerTemplates",
         JSON.stringify(updatedTemplates)
       );
-      alert("模板已保存！");
     } catch (error) {
       console.error("保存模板失败：", error);
-      alert("保存模板失败，请检查浏览器控制台。");
+      showToast("保存模板失败，请检查浏览器控制台。", "error");
     }
-  }, [searchText, replaceText, templates]);
+  }, [searchText, replaceText, templates, showToast]);
 
   const handleLoadTemplate = useCallback((template: Template) => {
     setSearchText(template.searchText);
     setReplaceText(template.replaceText);
-  }, []);
+    showToast("模板已加载！", "success");
+  }, [showToast]);
 
   const handleDeleteTemplate = useCallback(
     (templateId: string) => {
@@ -183,14 +202,13 @@ export default function TextReplacer() {
             "textReplacerTemplates",
             JSON.stringify(updatedTemplates)
           );
-          alert("模板已删除！");
         } catch (error) {
           console.error("删除模板失败：", error);
-          alert("删除模板失败，请检查浏览器控制台。");
+          showToast("删除模板失败，请检查浏览器控制台。", "error");
         }
       }
     },
-    [templates]
+    [templates, showToast]
   );
 
   return (
@@ -320,6 +338,17 @@ export default function TextReplacer() {
           </div>
         )}
       </div>
+
+      {/* Toast提示消息 */}
+      {toast && (
+        <div
+          className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow text-white ${
+            toast.type === "success" ? "bg-green-500" : "bg-red-500"
+          }`}
+        >
+          {toast.text}
+        </div>
+      )}
     </div>
   );
 }
