@@ -5,7 +5,7 @@ import type { MetaFunction } from "react-router";
 // 添加提示消息接口
 interface ToastMessage {
   text: string;
-  type: 'success' | 'error';
+  type: "success" | "error";
 }
 
 interface Template {
@@ -56,14 +56,17 @@ export default function TextReplacer() {
   const [toast, setToast] = useState<ToastMessage | null>(null);
 
   // 显示临时提示的函数
-  const showToast = useCallback((text: string, type: 'success' | 'error' = 'success') => {
-    setToast({ text, type });
-    
-    // 2.5秒后自动清除提示
-    setTimeout(() => {
-      setToast(null);
-    }, 2500);
-  }, []);
+  const showToast = useCallback(
+    (text: string, type: "success" | "error" = "success") => {
+      setToast({ text, type });
+
+      // 2.5秒后自动清除提示
+      setTimeout(() => {
+        setToast(null);
+      }, 2500);
+    },
+    []
+  );
 
   // 加载保存的状态和模板
   useEffect(() => {
@@ -186,11 +189,14 @@ export default function TextReplacer() {
     }
   }, [searchText, replaceText, templates, showToast]);
 
-  const handleLoadTemplate = useCallback((template: Template) => {
-    setSearchText(template.searchText);
-    setReplaceText(template.replaceText);
-    showToast("模板已加载！", "success");
-  }, [showToast]);
+  const handleLoadTemplate = useCallback(
+    (template: Template) => {
+      setSearchText(template.searchText);
+      setReplaceText(template.replaceText);
+      showToast("模板已加载！", "success");
+    },
+    [showToast]
+  );
 
   const handleDeleteTemplate = useCallback(
     (templateId: string) => {
@@ -253,12 +259,14 @@ export default function TextReplacer() {
       <div className="flex flex-col sm:flex-row sm:space-y-2 md:space-y-0 sm:space-x-0 md:space-x-4 mb-6 items-center">
         <button
           className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-2 sm:mb-0 md:mb-0"
+          style={{ backgroundColor: "#90CAF9" }}
           onClick={handleReplace}
         >
           替换内容
         </button>
         <button
           className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mb-2 sm:mb-0 md:mb-0"
+          style={{ backgroundColor: "#FFa500" }}
           onClick={handleCopy}
           disabled={!originalText}
         >
@@ -266,6 +274,7 @@ export default function TextReplacer() {
         </button>
         <button
           className="w-full sm:w-auto px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 mb-2 sm:mb-0 md:mb-0"
+          style={{ backgroundColor: "#111111" }}
           onClick={handleSaveTemplate}
         >
           保存为模版
@@ -323,12 +332,13 @@ export default function TextReplacer() {
                   <button
                     onClick={() => handleLoadTemplate(template)}
                     className="px-2 sm:px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs sm:text-sm"
+                    style={{ backgroundColor: "#90CAF9" }}
                   >
-                    加载
+                    使用
                   </button>
                   <button
                     onClick={() => handleDeleteTemplate(template.id)}
-                    className="px-2 sm:px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs sm:text-sm"
+                    className="px-2 sm:px-3 py-1 bg-black text-white rounded hover:bg-red-600 text-xs sm:text-sm"
                   >
                     删除
                   </button>
