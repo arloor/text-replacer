@@ -69,15 +69,56 @@ export default function TextReplacer() {
   const handleCopy = useCallback(() => {
     if (!originalText) return;
 
-    navigator.clipboard
-      .writeText(originalText)
-      .then(() => {
-        alert("已复制到剪贴板！");
-      })
-      .catch((err) => {
-        console.error("复制失败: ", err);
-      });
+    // 尝试使用现代API
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(originalText)
+        .then(() => {
+          alert("已复制到剪贴板！");
+        })
+        .catch((err) => {
+          console.error("现代API复制失败: ", err);
+          // 当现代API失败时，尝试使用fallback方法
+          fallbackCopyToClipboard(originalText);
+        });
+    } else {
+      // 在不支持navigator.clipboard的环境中使用后备方法
+      fallbackCopyToClipboard(originalText);
+    }
   }, [originalText]);
+
+  // 后备复制方法
+  const fallbackCopyToClipboard = (text: string) => {
+    try {
+      // 创建一个临时文本区域
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+
+      // 避免滚动到底部
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      // 执行复制命令
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
+
+      if (successful) {
+        alert("已复制到剪贴板！");
+      } else {
+        console.error("fallback复制方法失败");
+        alert("复制失败，请手动复制文本。");
+      }
+    } catch (err) {
+      console.error("fallback复制失败: ", err);
+      alert("复制失败，请手动复制文本。");
+    }
+  };
 
   const handleSaveTemplate = useCallback(() => {
     if (!searchText.trim() && !replaceText.trim()) {
