@@ -1,3 +1,20 @@
+# build
+
+```bash
+podman build . -f Dockerfile -t quay.io/arloor/text-replacer --network host
+podman login quay.io  
+podman push quay.io/arloor/text-replacer:latest 
+```
+
+# docker run
+
+```bash
+docker stop text-replacer
+docker rm text-replacer
+docker pull quay.io/arloor/text-replacer:latest
+docker run --restart=always --name text-replacer -d -p 7789:3000 quay.io/arloor/text-replacer:latest
+```
+
 # Welcome to React Router!
 
 A modern, production-ready template for building full-stack React applications using React Router.
