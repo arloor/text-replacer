@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react"; // Added useEffect
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import type { MetaFunction } from "react-router";
 
 interface Template {
@@ -40,24 +40,38 @@ export const meta: MetaFunction = () => {
 };
 
 export default function TextReplacer() {
-  const location = useLocation();
   const navigate = useNavigate();
 
   const [originalText, setOriginalText] = useState("");
-  const [searchText, setSearchText] = useState(
-    location.state?.searchText || ""
-  );
-  const [replaceText, setReplaceText] = useState(
-    location.state?.replaceText || ""
-  );
+  const [searchText, setSearchText] = useState("");
+  const [replaceText, setReplaceText] = useState("");
+  const [templates, setTemplates] = useState<Template[]>([]);
 
-  // Effect to clear location state after loading it
+  // 加载保存的状态和模板
   useEffect(() => {
-    // Changed useState to useEffect
-    if (location.state?.searchText || location.state?.replaceText) {
-      navigate(location.pathname, { replace: true, state: {} });
+    // 尝试加载模板列表
+    try {
+      const storedTemplates = localStorage.getItem("textReplacerTemplates");
+      if (storedTemplates) {
+        setTemplates(JSON.parse(storedTemplates));
+      }
+    } catch (error) {
+      console.error("加载模板失败：", error);
     }
-  }, [location.state, location.pathname, navigate]); // Added dependencies
+
+    // 如果有通过导航传递的搜索和替换文本，则设置它们
+    const searchParams = new URLSearchParams(window.location.search);
+    const searchTextParam = searchParams.get("searchText");
+    const replaceTextParam = searchParams.get("replaceText");
+
+    if (searchTextParam) setSearchText(searchTextParam);
+    if (replaceTextParam) setReplaceText(replaceTextParam);
+
+    // 清除URL参数
+    if (searchTextParam || replaceTextParam) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   const handleReplace = useCallback(() => {
     if (!originalText || !searchText) return;
@@ -141,35 +155,42 @@ export default function TextReplacer() {
     };
 
     try {
-      const existingTemplatesRaw = localStorage.getItem(
-        "textReplacerTemplates"
-      );
-      const existingTemplates: Template[] = existingTemplatesRaw
-        ? JSON.parse(existingTemplatesRaw)
-        : [];
-      existingTemplates.push(newTemplate);
+      const updatedTemplates = [...templates, newTemplate];
+      setTemplates(updatedTemplates);
       localStorage.setItem(
         "textReplacerTemplates",
-        JSON.stringify(existingTemplates)
+        JSON.stringify(updatedTemplates)
       );
       alert("模板已保存！");
     } catch (error) {
       console.error("保存模板失败：", error);
       alert("保存模板失败，请检查浏览器控制台。");
     }
-  }, [searchText, replaceText]);
+  }, [searchText, replaceText, templates]);
 
-  const handleLoadTemplate = useCallback(
-    (template: Template) => {
-      // Navigate to the text replacer page and pass template data via location state
-      navigate("/", {
-        state: {
-          searchText: template.searchText,
-          replaceText: template.replaceText,
-        },
-      });
+  const handleLoadTemplate = useCallback((template: Template) => {
+    setSearchText(template.searchText);
+    setReplaceText(template.replaceText);
+  }, []);
+
+  const handleDeleteTemplate = useCallback(
+    (templateId: string) => {
+      if (window.confirm("确定要删除这个模板吗？")) {
+        try {
+          const updatedTemplates = templates.filter((t) => t.id !== templateId);
+          setTemplates(updatedTemplates);
+          localStorage.setItem(
+            "textReplacerTemplates",
+            JSON.stringify(updatedTemplates)
+          );
+          alert("模板已删除！");
+        } catch (error) {
+          console.error("删除模板失败：", error);
+          alert("删除模板失败，请检查浏览器控制台。");
+        }
+      }
     },
-    [navigate]
+    [templates]
   );
 
   return (
@@ -211,7 +232,7 @@ export default function TextReplacer() {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:space-y-2 md:space-y-0 sm:space-x-0 md:space-x-4 mb-4 items-center">
+      <div className="flex flex-col sm:flex-row sm:space-y-2 md:space-y-0 sm:space-x-0 md:space-x-4 mb-6 items-center">
         <button
           className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-2 sm:mb-0 md:mb-0"
           onClick={handleReplace}
@@ -231,12 +252,73 @@ export default function TextReplacer() {
         >
           保存为模版
         </button>
-        <Link
-          to="/templates"
-          className="w-full sm:w-auto text-center px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-        >
-          管理模版
-        </Link>
+      </div>
+
+      {/* 模板管理部分 */}
+      <div className="mt-8 border-t pt-6">
+        <h2 className="text-xl font-bold mb-4">已保存模版</h2>
+
+        {templates.length === 0 ? (
+          <p className="text-center text-gray-500 mt-4 mb-6">
+            暂无保存的模版，请先保存模版。
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {templates.map((template) => (
+              <div
+                key={template.id}
+                className="p-3 sm:p-4 border border-gray-300 rounded shadow"
+              >
+                <h2
+                  className="text-lg sm:text-xl font-semibold mb-2 truncate"
+                  title={template.name}
+                >
+                  {template.name}
+                </h2>
+                <div className="mb-1">
+                  <div className="flex items-center">
+                    <span className="font-medium text-sm sm:text-base mr-1">
+                      查找:
+                    </span>
+                    <span
+                      className="text-gray-700 truncate text-sm sm:text-base"
+                      title={template.searchText}
+                    >
+                      {template.searchText || "(空)"}
+                    </span>
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <div className="flex items-center">
+                    <span className="font-medium text-sm sm:text-base mr-1">
+                      替换为:
+                    </span>
+                    <span
+                      className="text-gray-700 truncate text-sm sm:text-base"
+                      title={template.replaceText}
+                    >
+                      {template.replaceText || "(空)"}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => handleLoadTemplate(template)}
+                    className="px-2 sm:px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs sm:text-sm"
+                  >
+                    加载
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTemplate(template.id)}
+                    className="px-2 sm:px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs sm:text-sm"
+                  >
+                    删除
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
