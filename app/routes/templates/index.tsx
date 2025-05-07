@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import type { MetaFunction } from "react-router";
 
 // Define the Template interface (should be consistent with TextReplacer component)
 interface Template {
@@ -8,6 +9,33 @@ interface Template {
   searchText: string;
   replaceText: string;
 }
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "模版管理 | 文本替换工具" },
+    {
+      name: "description",
+      content: "管理您保存的文本替换模版，快速加载和使用常用替换规则。",
+    },
+    {
+      name: "keywords",
+      content: "模版管理,文本替换,查找替换,模版存储,文本处理",
+    },
+    { name: "author", content: "文本替换工具" },
+    { property: "og:title", content: "模版管理 | 文本替换工具" },
+    {
+      property: "og:description",
+      content: "管理您保存的文本替换模版，快速加载和使用常用替换规则。",
+    },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "twitter:title", content: "模版管理 | 文本替换工具" },
+    {
+      name: "twitter:description",
+      content: "管理您保存的文本替换模版，快速加载和使用常用替换规则。",
+    },
+  ];
+};
 
 export default function TemplatesManager() {
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -48,7 +76,7 @@ export default function TemplatesManager() {
   const handleLoadTemplate = useCallback(
     (template: Template) => {
       // Navigate to the text replacer page and pass template data via location state
-      navigate("/text-replacer", {
+      navigate("/", {
         state: {
           searchText: template.searchText,
           replaceText: template.replaceText,
