@@ -87,6 +87,19 @@ export default function TextReplacer() {
     }
   }, [searchText, replaceText]);
 
+  const handleLoadTemplate = useCallback(
+    (template: Template) => {
+      // Navigate to the text replacer page and pass template data via location state
+      navigate("/", {
+        state: {
+          searchText: template.searchText,
+          replaceText: template.replaceText,
+        },
+      });
+    },
+    [navigate]
+  );
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4 text-center md:text-left">

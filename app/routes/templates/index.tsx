@@ -65,7 +65,7 @@ export default function TemplatesManager() {
           模版管理
         </h1>
         <Link
-          to="/text-replacer"
+          to="/"
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           返回替换工具
