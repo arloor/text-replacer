@@ -1,4 +1,4 @@
-import type { Route } from "./+types";
+import type { Route } from "./+types/index";
 
 export default function MyRouteComponent({
   loaderData,
