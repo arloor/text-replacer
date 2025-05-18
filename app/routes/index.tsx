@@ -1,6 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { MetaFunction } from "react-router";
+import { data, redirect } from "react-router";
+import { getSession } from "~/sessions.server";
+import type { Route } from "./+types";
 
 // 添加提示消息接口
 interface ToastMessage {
@@ -13,6 +16,24 @@ interface Template {
   name: string;
   searchText: string;
   replaceText: string;
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get("Cookie"));
+
+  if (!session.has("userId")) {
+    // Redirect to the home page if they are already signed in.
+    return redirect("/login");
+  }
+
+  return data(
+    { error: session.get("error") }
+    // {
+    //   headers: {
+    //     "Set-Cookie": await commitSession(session),
+    //   },
+    // }
+  );
 }
 
 export const meta: MetaFunction = () => {
