@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import type { MetaFunction } from "react-router";
 import { data, redirect } from "react-router";
 import { getSession } from "~/sessions.server";
@@ -240,9 +240,31 @@ export default function TextReplacer() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center md:text-left">
-        文本替换工具
-      </h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-center md:text-left">
+          文本替换工具
+        </h1>
+        <Link
+          to="/logout"
+          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md transition-colors duration-200 flex items-center shadow-sm border border-gray-200 dark:border-gray-600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 mr-0 md:mr-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            />
+          </svg>
+          <span className="hidden sm:hidden md:inline">退出登录</span>
+        </Link>
+      </div>
 
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">文本内容</label>
