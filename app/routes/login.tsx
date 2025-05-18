@@ -2,6 +2,7 @@ import { data, redirect } from "react-router";
 import type { Route } from "./+types/login";
 
 import { getSession, commitSession } from "../sessions.server";
+import { validateCredentials } from "../auth.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -71,32 +72,4 @@ export default function Login({ loaderData }: Route.ComponentProps) {
       </form>
     </div>
   );
-}
-
-async function validateCredentials(
-  username: FormDataEntryValue | null,
-  password: FormDataEntryValue | null
-): Promise<string | null> {
-  // Basic validation
-  if (
-    !username ||
-    !password ||
-    typeof username !== "string" ||
-    typeof password !== "string"
-  ) {
-    return null;
-  }
-
-  // In a real application, you would:
-  // 1. Check credentials against a database
-  // 2. Use proper password hashing (bcrypt, argon2, etc.)
-  // 3. Never store plain-text passwords
-
-  // This is a simplified example - replace with actual authentication logic
-  if (username === "admin" && password === "password") {
-    return "user_123"; // Return a user ID on successful authentication
-  }
-
-  // Authentication failed
-  return null;
 }
