@@ -15,6 +15,21 @@ docker pull quay.io/arloor/text-replacer:latest
 docker run --restart=always --name text-replacer -d -p 7789:3000 quay.io/arloor/text-replacer:latest
 ```
 
+# 代码拆分
+
+```bash
+[plugin:vite:import-analysis] Server-only module referenced by client
+
+    '~/sessions.server' imported by route 'app/routes/index.tsx'
+
+  React Router automatically removes server-code from these exports:
+    `loader`, `action`, `unstable_middleware`, `headers`
+
+  But other route exports in 'app/routes/index.tsx' depend on '~/sessions.server'.
+
+  See https://remix.run/docs/en/main/guides/vite#splitting-up-client-and-server-code
+```
+
 # Welcome to React Router!
 
 A modern, production-ready template for building full-stack React applications using React Router.
