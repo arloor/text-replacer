@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import type { MetaFunction } from "react-router";
 import { data, redirect } from "react-router";
 import { getSession } from "~/sessions.server";
@@ -67,8 +67,6 @@ export const meta: MetaFunction = () => {
 };
 
 export default function TextReplacer() {
-  const navigate = useNavigate();
-
   const [originalText, setOriginalText] = useState("");
   const [searchText, setSearchText] = useState("");
   const [replaceText, setReplaceText] = useState("");

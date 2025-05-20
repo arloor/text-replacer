@@ -6,7 +6,6 @@ import { validateCredentials } from "../auth.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
-  console.log("session", session.data);
 
   if (session.has("userId")) {
     // Redirect to the home page if they are already signed in.
