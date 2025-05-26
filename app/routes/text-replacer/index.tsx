@@ -13,6 +13,7 @@ interface Template {
   name: string;
   searchText: string;
   replaceText: string;
+  useRegex: boolean; // 新增字段，标识是否使用正则表达式
 }
 
 export const meta: MetaFunction = () => {
@@ -51,6 +52,7 @@ export default function TextReplacer() {
   const [originalText, setOriginalText] = useState("");
   const [searchText, setSearchText] = useState("");
   const [replaceText, setReplaceText] = useState("");
+  const [useRegex, setUseRegex] = useState(false); // 新增状态：是否使用正则表达式
   const [templates, setTemplates] = useState<Template[]>([]);
   // 添加toast提示消息状态
   const [toast, setToast] = useState<ToastMessage | null>(null);
@@ -97,10 +99,31 @@ export default function TextReplacer() {
   const handleReplace = useCallback(() => {
     if (!originalText || !searchText) return;
 
-    const replaced = originalText.split(searchText).join(replaceText);
-    setOriginalText(replaced);
-    showToast("替换完成！", "success");
-  }, [originalText, searchText, replaceText, showToast]);
+    try {
+      let replaced;
+
+      if (useRegex) {
+        // 使用正则表达式替换
+        try {
+          const regex = new RegExp(searchText, "g");
+          replaced = originalText.replace(regex, replaceText);
+        } catch (error) {
+          console.error("正则表达式错误:", error);
+          showToast("正则表达式格式错误，请检查后重试！", "error");
+          return;
+        }
+      } else {
+        // 普通文本替换
+        replaced = originalText.split(searchText).join(replaceText);
+      }
+
+      setOriginalText(replaced);
+      showToast("替换完成！", "success");
+    } catch (error) {
+      console.error("替换过程出错:", error);
+      showToast("替换过程出错，请检查输入内容!", "error");
+    }
+  }, [originalText, searchText, replaceText, useRegex, showToast]);
 
   const handleCopy = useCallback(() => {
     if (!originalText) return;
@@ -174,6 +197,7 @@ export default function TextReplacer() {
       name: templateName,
       searchText,
       replaceText,
+      useRegex, // 保存是否使用正则表达式的设置
     };
 
     try {
@@ -187,12 +211,13 @@ export default function TextReplacer() {
       console.error("保存模板失败：", error);
       showToast("保存模板失败，请检查浏览器控制台。", "error");
     }
-  }, [searchText, replaceText, templates, showToast]);
+  }, [searchText, replaceText, templates, useRegex, showToast]);
 
   const handleLoadTemplate = useCallback(
     (template: Template) => {
       setSearchText(template.searchText);
       setReplaceText(template.replaceText);
+      setUseRegex(template.useRegex ?? false); // 加载正则表达式设置，如果旧模板没有该属性则默认为false
       showToast("模板已加载！", "success");
     },
     [showToast]
@@ -236,13 +261,32 @@ export default function TextReplacer() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium mb-1">查找文本</label>
-          <input
-            type="text"
-            className="w-full p-2 border border-gray-300 rounded"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="要查找的文本"
-          />
+          <div className="flex flex-col space-y-2">
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="要查找的文本"
+            />
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="useRegex"
+                className="mr-2"
+                checked={useRegex}
+                onChange={(e) => setUseRegex(e.target.checked)}
+              />
+              <label htmlFor="useRegex" className="text-sm">
+                使用正则表达式
+              </label>
+              {useRegex && (
+                <span className="ml-2 text-xs text-gray-500">
+                  (提示: 将自动应用全局标志 'g')
+                </span>
+              )}
+            </div>
+          </div>
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">替换为</label>
@@ -253,6 +297,11 @@ export default function TextReplacer() {
             onChange={(e) => setReplaceText(e.target.value)}
             placeholder="替换成的文本"
           />
+          {useRegex && (
+            <div className="mt-2 text-xs text-gray-500">
+              提示: 可以使用 $1, $2 等引用捕获组
+            </div>
+          )}
         </div>
       </div>
 
@@ -313,6 +362,11 @@ export default function TextReplacer() {
                     >
                       {template.searchText || "(空)"}
                     </span>
+                    {template.useRegex && (
+                      <span className="ml-1 px-1 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
+                        正则
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="mb-3">
