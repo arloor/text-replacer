@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   data,
   redirect,
@@ -8,10 +7,7 @@ import {
 import type { MetaFunction } from "react-router";
 import type { StockEntry, StockHqData } from "../types/real-time";
 import { TopNavigation } from "~/components/TopNavigation";
-import { TableViewControl } from "~/components/TableViewControl";
-import { AutoRefreshControl } from "~/components/AutoRefreshControl";
 import { StockTableView } from "~/components/realtime/StockTableView";
-import { StockCardView } from "~/components/realtime/StockCardView";
 import { StockCodeManager } from "~/components/realtime/StockCodeManager";
 import { StatsDisplay } from "~/components/realtime/StatsDisplay";
 import {
@@ -116,7 +112,6 @@ export default function RealtimePage() {
     totalProfitRate: 0,
   };
   const [searchParams] = useSearchParams();
-  const view = searchParams.get("view") || "table"; // 默认使用表格视图
   const colored = searchParams.get("colored") !== "false"; // 默认为true
 
   return (
@@ -133,10 +128,6 @@ export default function RealtimePage() {
             colored={colored}
           />
         </div>
-        <div className="flex flex-row justify-end items-center gap-2">
-          <TableViewControl />
-          <AutoRefreshControl />
-        </div>
       </div>
       {error ? (
         <div className="rounded-lg border p-6 shadow-sm bg-red-50 text-red-600">
@@ -152,15 +143,11 @@ export default function RealtimePage() {
         </div>
       ) : (
         <>
-          {view === "table" ? (
-            <StockTableView
-              stocksData={stocksData}
-              codes={stockCells}
-              colored={colored}
-            />
-          ) : (
-            <StockCardView stocksData={stocksData} colored={colored} />
-          )}
+          <StockTableView
+            stocksData={stocksData}
+            codes={stockCells}
+            colored={colored}
+          />
         </>
       )}
       <div className="flex justify-center sm:justify-start mt-4">

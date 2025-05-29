@@ -1,5 +1,4 @@
 import type { ApiResponse, StockData } from "../types/stock";
-import { CardWithForm } from "./CardDemo";
 import type { DateRange } from "react-day-picker";
 import { ScrollToTopButton } from "./ScrollToTopButton";
 import { TableView } from "./TableView";
@@ -11,7 +10,7 @@ interface PanelProps {
   view?: string;
 }
 
-export function Panel({ dateRange, distinctCode, view = "card" }: PanelProps) {
+export function Panel({ dateRange, distinctCode }: PanelProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<StockData[]>([]);
@@ -140,20 +139,7 @@ export function Panel({ dateRange, distinctCode, view = "card" }: PanelProps) {
 
   return (
     <>
-      {view === "table" ? (
-        <TableView data={data} />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 width-full">
-          {data.map((stockData) => {
-            return (
-              <CardWithForm
-                key={`${stockData.code}_${stockData.calc_time}`}
-                {...stockData}
-              />
-            );
-          })}
-        </div>
-      )}
+      <TableView data={data} />
       <ScrollToTopButton />
     </>
   );

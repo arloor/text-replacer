@@ -1,9 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { MetaFunction } from "react-router";
-import { data, redirect } from "react-router";
-import { getSession } from "~/sessions.server";
-import type { Route } from "./+types";
 import type { DateRange } from "react-day-picker";
 import { Label } from "../components/ui/label";
 import { DatePickerDemo } from "../components/DatePicker";
@@ -12,37 +8,6 @@ import { TopNavigation } from "../components/TopNavigation";
 import { TableViewControl } from "../components/TableViewControl";
 import { AutoRefreshControl } from "../components/AutoRefreshControl";
 import { DistinctControl } from "../components/DistinctControl";
-
-// 添加提示消息接口
-interface ToastMessage {
-  text: string;
-  type: "success" | "error";
-}
-
-interface Template {
-  id: string;
-  name: string;
-  searchText: string;
-  replaceText: string;
-}
-
-export async function loader({ request }: Route.LoaderArgs) {
-  const session = await getSession(request.headers.get("Cookie"));
-
-  if (!session.has("userId")) {
-    // Redirect to the home page if they are already signed in.
-    return redirect("/login");
-  }
-
-  return data(
-    { error: session.get("error") }
-    // {
-    //   headers: {
-    //     "Set-Cookie": await commitSession(session),
-    //   },
-    // }
-  );
-}
 
 export const meta: MetaFunction = () => {
   return [
@@ -107,7 +72,6 @@ export default function StockPanel() {
           <DatePickerDemo className="w-auto" />
         </div>
         <div className="flex flex-row items-center justify-end gap-2">
-          <TableViewControl />
           <AutoRefreshControl />
           <DistinctControl />
         </div>
@@ -117,7 +81,6 @@ export default function StockPanel() {
           <Panel
             dateRange={dateRange}
             distinctCode={distinctCode}
-            view={view}
           />
         </div>
       ) : (
