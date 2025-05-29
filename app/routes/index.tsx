@@ -72,16 +72,12 @@ export default function StockPanel() {
           <DatePickerDemo className="w-auto" />
         </div>
         <div className="flex flex-row items-center justify-end gap-2">
-          <AutoRefreshControl />
           <DistinctControl />
         </div>
       </div>
       {dateRange?.from ? (
         <div>
-          <Panel
-            dateRange={dateRange}
-            distinctCode={distinctCode}
-          />
+          <Panel dateRange={dateRange} distinctCode={distinctCode} />
         </div>
       ) : (
         <p className="text-center text-gray-500 mt-8">请选择日期</p>
