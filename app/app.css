@@ -8,5 +8,53 @@
 html,
 body {
   @apply bg-white dark:bg-gray-950;
+}
 
+/* 额外样式 */
+.bg-card {
+  background-color: white;
+}
+
+.text-card-foreground {
+  color: #0f172a;
+}
+
+.text-muted-foreground {
+  color: #64748b;
+}
+
+.text-link {
+  color: #3b82f6;
+}
+
+.text-link:hover {
+  color: #1d4ed8;
+}
+
+/* 日期选择器样式 */
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: #0ea5e9;
+  --rdp-background-color: #e0f2fe;
+  --rdp-accent-color-dark: #0ea5e9;
+  --rdp-background-color-dark: #075985;
+  --rdp-outline: 2px solid var(--rdp-accent-color);
+  --rdp-outline-selected: 2px solid var(--rdp-accent-color);
+  margin: 1em;
+}
+
+.rdp-day_selected, 
+.rdp-day_selected:focus-visible, 
+.rdp-day_selected:hover {
+  background-color: var(--rdp-accent-color);
+  color: white;
+}
+
+/* 添加react-day-picker的样式 */
+.rdp-day_range_start, .rdp-day_range_end {
+  @apply bg-blue-500 text-white ;
+}
+
+.rdp-day_range_middle {
+  @apply bg-blue-100 ;
 }
