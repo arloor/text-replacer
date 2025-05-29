@@ -89,17 +89,18 @@ export default function StockManagerPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(entries),
+        body: JSON.stringify({ email: userId, stocks: entries }),
       });
 
       if (!response.ok) {
-        throw new Error(`保存失败: ${response.statusText}`);
+        let errorText = await response.text();
+        throw new Error(`保存失败: ${errorText}`);
       }
 
       showToast("保存成功", "success");
 
       // 刷新页面来获取最新数据
-      navigate(0);
+    //   navigate(0);
     } catch (error) {
       console.error("Failed to save stock:", error);
       showToast(
