@@ -24,7 +24,9 @@ export function AutoRefreshControl() {
       newParams.delete("autoRefresh");
     }
 
-    navigate(`/?${newParams.toString()}`);
+    // 获取当前路径，确保在相同路径上添加参数
+    const currentPath = window.location.pathname;
+    navigate(`${currentPath}?${newParams.toString()}`);
   };
 
   // 自动刷新逻辑

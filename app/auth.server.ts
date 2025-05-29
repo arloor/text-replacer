@@ -29,7 +29,7 @@ export async function validateCredentials(
 
   // 这是一个简化的示例 - 请替换为实际的身份验证逻辑
   if (username === "admin" && password === "liuganghuan") {
-    return "user_123"; // 身份验证成功时返回用户ID
+    return "admin@arloor.com"; // 身份验证成功时返回用户ID
   }
 
   // 身份验证失败

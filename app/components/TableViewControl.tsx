@@ -26,7 +26,9 @@ export function TableViewControl() {
     const newParams = new URLSearchParams(searchParams);
     newParams.set("view", newViewType);
 
-    navigate(`/?${newParams.toString()}`);
+    // 获取当前路径，确保在相同路径上添加参数
+    const currentPath = window.location.pathname;
+    navigate(`${currentPath}?${newParams.toString()}`);
   };
 
   return (
