@@ -17,7 +17,7 @@ import {
 } from "~/components/realtime/stockUtils";
 import type { Route } from "./+types";
 import { getSession } from "~/sessions.server";
-import { se, tr } from "date-fns/locale";
+import { useEffect } from "react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -30,7 +30,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
 
   if (!session.has("userId")) {
-    // Redirect to the home page if they are already signed in.
     return redirect("/login");
   }
   try {
@@ -75,20 +74,13 @@ export async function loader({ request }: Route.LoaderArgs) {
       return aIndex - bIndex;
     });
     const statsData = calculateTotalStats(allStocksData);
-    return data(
-      {
-        error: session.get("error"),
-        userId: session.get("userId"),
-        stockCells,
-        allStocksData,
-        statsData,
-      }
-      // {
-      //   headers: {
-      //     "Set-Cookie": await commitSession(session),
-      //   },
-      // }
-    );
+    return data({
+      error: session.get("error"),
+      userId: session.get("userId"),
+      stockCells,
+      allStocksData,
+      statsData,
+    });
   } catch (err) {
     console.error("加载股票列表失败:", err);
     return data({
@@ -99,9 +91,27 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 // 客户端渲染的主组件
 export default function RealtimePage() {
+  const isAutoRefresh = false; // 是否启用自动刷新
+  // 自动刷新逻辑
+  useEffect(() => {
+    let intervalId: number | undefined;
+
+    if (isAutoRefresh) {
+      intervalId = window.setInterval(() => {
+        window.location.reload();
+      }, 3000); // 30秒刷新一次
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isAutoRefresh]);
   const loaderData = useLoaderData();
-  console.log("Loader Data:", loaderData);
+  // console.log("Loader Data:", loaderData);
   const userId = loaderData.userId || "";
+  console.log("User ID:", userId);
   const error = loaderData.error || "";
   loaderData.error && console.error("Error:", loaderData.error);
   const stockCells: StockEntry[] = loaderData.stockCells || [];

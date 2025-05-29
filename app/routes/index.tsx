@@ -10,33 +10,7 @@ import { AutoRefreshControl } from "../components/AutoRefreshControl";
 import { DistinctControl } from "../components/DistinctControl";
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "文本替换工具 | 在线文本处理" },
-    {
-      name: "description",
-      content:
-        "在线文本替换工具，快速查找和替换文本内容，支持保存常用替换模版。",
-    },
-    {
-      name: "keywords",
-      content: "文本替换,查找替换,文本处理,在线工具,替换模版",
-    },
-    { name: "author", content: "文本替换工具" },
-    { property: "og:title", content: "文本替换工具 | 在线文本处理" },
-    {
-      property: "og:description",
-      content:
-        "在线文本替换工具，快速查找和替换文本内容，支持保存常用替换模版。",
-    },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-    { name: "twitter:title", content: "文本替换工具 | 在线文本处理" },
-    {
-      name: "twitter:description",
-      content:
-        "在线文本替换工具，快速查找和替换文本内容，支持保存常用替换模版。",
-    },
-  ];
+  return [{ title: "人气股票" }];
 };
 
 // 股票面板页面
