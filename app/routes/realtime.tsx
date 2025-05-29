@@ -90,7 +90,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 // 客户端渲染的主组件
 export default function RealtimePage() {
-  const isAutoRefresh = false; // 是否启用自动刷新
+  const isAutoRefresh = true; // 是否启用自动刷新
   // 自动刷新逻辑
   useEffect(() => {
     let intervalId: number | undefined;

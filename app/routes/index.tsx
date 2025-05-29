@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, redirect, useSearchParams } from "react-router-dom";
 import type { MetaFunction } from "react-router";
 import type { DateRange } from "react-day-picker";
 import { Label } from "../components/ui/label";
@@ -8,10 +8,15 @@ import { TopNavigation } from "../components/TopNavigation";
 import { TableViewControl } from "../components/TableViewControl";
 import { AutoRefreshControl } from "../components/AutoRefreshControl";
 import { DistinctControl } from "../components/DistinctControl";
+import type { Route } from "./+types";
 
 export const meta: MetaFunction = () => {
   return [{ title: "人气股票" }];
 };
+
+export async function loader({ request }: Route.LoaderArgs) {
+  return redirect("/realtime"); // 重定向到首页
+}
 
 // 股票面板页面
 export default function StockPanel() {
