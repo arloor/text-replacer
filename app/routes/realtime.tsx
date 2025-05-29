@@ -8,7 +8,6 @@ import type { MetaFunction } from "react-router";
 import type { StockEntry, StockHqData } from "../types/real-time";
 import { TopNavigation } from "~/components/TopNavigation";
 import { StockTableView } from "~/components/realtime/StockTableView";
-import { StockCodeManager } from "~/components/realtime/StockCodeManager";
 import { StatsDisplay } from "~/components/realtime/StatsDisplay";
 import {
   calculateTotalStats,
@@ -148,7 +147,7 @@ export default function RealtimePage() {
         <div className="rounded-lg border p-6 shadow-sm">
           <h2 className="mb-2 text-xl font-semibold">未找到股票数据</h2>
           <p className="text-gray-600">
-            请点击下方的"设置股票"按钮添加您的股票。
+            请点击下方的"设置股票"按钮进入股票管理页面添加您的股票。
           </p>
         </div>
       ) : (
@@ -161,7 +160,12 @@ export default function RealtimePage() {
         </>
       )}
       <div className="flex justify-center sm:justify-start mt-4">
-        <StockCodeManager stockCells={stockCells} />
+        <a
+          href="/stock-manager"
+          className="mb-4 px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+        >
+          设置股票
+        </a>
       </div>
     </div>
   );
