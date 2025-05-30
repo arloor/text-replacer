@@ -1,16 +1,12 @@
+import type { stockStats } from "./stockUtils";
+
 interface StatsDisplayProps {
-  totalProfit: string;
-  totalPositionValue: string;
-  totalProfitRate: string;
+  stats: stockStats;
   colored: boolean;
 }
 
-export function StatsDisplay({
-  totalProfit,
-  totalPositionValue,
-  totalProfitRate,
-  colored,
-}: StatsDisplayProps) {
+export function StatsDisplay({ stats, colored }: StatsDisplayProps) {
+  const { totalProfit, totalPositionValue, totalProfitRate } = stats;
   return (
     <div className="font-bold">
       <span>今日盈亏：</span>

@@ -5,14 +5,13 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import type { MetaFunction } from "react-router";
-import type { StockEntry, StockHqData } from "../types/real-time";
 import { TopNavigation } from "~/components/TopNavigation";
 import { StockTableView } from "~/components/realtime/StockTableView";
 import { StatsDisplay } from "~/components/realtime/StatsDisplay";
 import type { Route } from "./+types";
 import { getSession } from "~/functions/sessions.server";
-import { useEffect } from "react";
-import { loadData } from "~/functions/loader.server";
+import { useCallback, useEffect, useState } from "react";
+import { loadData, type UserStockData } from "~/functions/loader.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -32,40 +31,20 @@ export async function loader({ request }: Route.LoaderArgs) {
   return data({ ...userStockData, userId: userId });
 }
 
-// 客户端渲染的主组件
-export default function RealtimePage() {
-  const isAutoRefresh = true; // 是否启用自动刷新
-  // 自动刷新逻辑
-  useEffect(() => {
-    let intervalId: number | undefined;
+// 创建接收UserStockData参数的组件
+export interface RealtimeProps {
+  data: UserStockData;
+  colored?: boolean;
+  error?: string;
+}
 
-    if (isAutoRefresh) {
-      intervalId = window.setInterval(() => {
-        window.location.reload();
-      }, 3000); // 30秒刷新一次
-    }
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [isAutoRefresh]);
-  const loaderData = useLoaderData();
-  console.log("Loader Data:", loaderData);
-  const userId = loaderData.userId || "";
+export function RealtimeComponent({
+  data,
+  colored = true,
+  error = "",
+}: RealtimeProps) {
+  const { userId, stockCells, allStocksData, statsData } = data;
   console.log("User ID:", userId);
-  const error = loaderData.error || "";
-  loaderData.error && console.error("Error:", loaderData.error);
-  const stockCells: StockEntry[] = loaderData.stockCells || [];
-  const stocksData: StockHqData[] = loaderData.allStocksData || [];
-  const stats = loaderData.statsData || {
-    totalProfit: 0,
-    totalPositionValue: 0,
-    totalProfitRate: 0,
-  };
-  const [searchParams] = useSearchParams();
-  const colored = searchParams.get("colored") !== "false"; // 默认为true
 
   return (
     <div className="container mx-auto p-4">
@@ -74,12 +53,7 @@ export default function RealtimePage() {
           <TopNavigation />
         </div>
         <div className="flex flex-row justify-end items-center gap-2 sm:mr-auto">
-          <StatsDisplay
-            totalProfit={stats.totalProfit}
-            totalPositionValue={stats.totalPositionValue}
-            totalProfitRate={stats.totalProfitRate}
-            colored={colored}
-          />
+          <StatsDisplay stats={statsData} colored={colored} />
         </div>
       </div>
       {error ? (
@@ -97,7 +71,7 @@ export default function RealtimePage() {
       ) : (
         <>
           <StockTableView
-            stocksData={stocksData}
+            stocksData={allStocksData}
             codes={stockCells}
             colored={colored}
           />
@@ -113,4 +87,51 @@ export default function RealtimePage() {
       </div>
     </div>
   );
+}
+
+// 客户端渲染的主组件
+export default function RealtimePage() {
+  const loadData: UserStockData = useLoaderData();
+  console.log("Loader Data:", loadData);
+  const [userStockData, setUserStockData] = useState(loadData); // 确保数据在组件中可用
+
+  // 自动刷新逻辑
+  useEffect(() => {
+    let intervalId: number | undefined;
+
+    intervalId = window.setInterval(() => {
+      fetchData();
+    }, 3000); // 30秒刷新一次
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, []);
+
+  // 获取数据的函数
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch("/data");
+      if (!response.ok) {
+        throw new Error(`请求失败: ${response.status}`);
+      }
+
+      const newData: UserStockData = await response.json();
+      console.log("Fetched new data:", newData);
+
+      // 更新状态
+      setUserStockData(newData);
+    } catch (err) {
+      console.error("获取数据失败:", err);
+    } finally {
+    }
+  }, []);
+
+  const [searchParams] = useSearchParams();
+  const colored = searchParams.get("colored") !== "false"; // 默认为true
+
+  // 使用新的RealtimeComponent组件
+  return <RealtimeComponent data={userStockData} colored={colored} />;
 }
