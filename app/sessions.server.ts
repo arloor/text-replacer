@@ -22,7 +22,7 @@ const { getSession, commitSession, destroySession } =
         //
         // expires: new Date(Date.now() + 60_000),
         httpOnly: true,
-        maxAge: 60,
+        maxAge: 604800, // -1 means the session will not expire
         path: "/",
         sameSite: "lax",
         secrets: ["s3cret1"],
