@@ -10,8 +10,14 @@ let hkdCnyRateCache: RateCache = {
   timestamp: 0, // 上次更新时间
 };
 
+export interface stockStats {
+    totalProfit: string;
+    totalPositionValue: string;
+    totalProfitRate: string;
+  };
+
 // 计算总体统计数据
-export function calculateTotalStats(stocksData: (StockHqData | null)[]) {
+export function calculateTotalStats(stocksData: (StockHqData | null)[]): stockStats {
   const totalProfit = stocksData
     .reduce(
       (sum, stock) => sum + (stock?.profit ? parseFloat(stock.profit) : 0),

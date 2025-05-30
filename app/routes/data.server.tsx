@@ -7,9 +7,10 @@ import {
   calculateTotalStats,
   fetchAStocks,
   fetchHKStocks,
+  type stockStats,
 } from "~/components/realtime/stockUtils";
 import { getSession } from "~/sessions.server";
-import type { StockEntry } from "~/types/real-time";
+import type { StockEntry, StockHqData } from "~/types/real-time";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
@@ -20,13 +21,17 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return loadData(userId);
 };
 
-async function loadData(userId: string | undefined) {
+export interface StockData {
+  userId: string;
+  stockCells: StockEntry[];
+  allStocksData: (StockHqData | null)[];
+  statsData: stockStats;
+}
+
+async function loadData(userId: string | undefined): Promise<StockData> {
   console.log("Loader called with userId:", userId);
   if (!userId) {
-    return Response.json({
-      msg: "用户未登录",
-      code: 401,
-    });
+    throw new Error("用户未登录或用户ID无效");
   }
   try {
     const response = await fetch(
@@ -70,22 +75,16 @@ async function loadData(userId: string | undefined) {
       return aIndex - bIndex;
     });
     const statsData = calculateTotalStats(allStocksData);
-    return Response.json({
-      code: 200,
-      data: {
-        userId: userId,
-        stockCells,
-        allStocksData,
-        statsData,
-      },
-      msg: "",
-    });
+    return {
+      userId: userId,
+      stockCells,
+      allStocksData,
+      statsData,
+    };
   } catch (err) {
-    console.error("加载股票列表失败:", err);
-    return Response.json({
-      msg: err,
-      code: 500,
-    });
+    throw new Error(
+      "数据加载失败: " + (err instanceof Error ? err.message : "未知错误")
+    );
   }
 }
 
