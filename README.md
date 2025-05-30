@@ -9,10 +9,10 @@ podman push quay.io/arloor/text-replacer:stock
 # docker run
 
 ```bash
-docker stop text-replacer
-docker rm text-replacer
+docker stop stock-vite
+docker rm stock-vite
 docker pull quay.io/arloor/text-replacer:stock
-docker run --restart=always --name text-replacer -d -p 7780:3000 quay.io/arloor/text-replacer:stock
+docker run --restart=always --name stock-vite -d -p 7780:3000 quay.io/arloor/text-replacer:stock
 ```
 
 # 代码拆分
