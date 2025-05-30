@@ -1,9 +1,9 @@
 # build
 
 ```bash
-podman build . -f Dockerfile -t quay.io/arloor/text-replacer --network host
+podman build . -f Dockerfile -t quay.io/arloor/text-replacer:stock --network host
 podman login quay.io  
-podman push quay.io/arloor/text-replacer:latest 
+podman push quay.io/arloor/text-replacer:stock 
 ```
 
 # docker run
@@ -11,8 +11,8 @@ podman push quay.io/arloor/text-replacer:latest
 ```bash
 docker stop text-replacer
 docker rm text-replacer
-docker pull quay.io/arloor/text-replacer:latest
-docker run --restart=always --name text-replacer -d -p 7789:3000 quay.io/arloor/text-replacer:latest
+docker pull quay.io/arloor/text-replacer:stock
+docker run --restart=always --name text-replacer -d -p 7780:3000 quay.io/arloor/text-replacer:stock
 ```
 
 # 代码拆分
