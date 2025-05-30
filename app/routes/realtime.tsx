@@ -98,7 +98,7 @@ export function RealtimeComponent({
 // 客户端渲染的主组件
 export default function RealtimePage() {
   const loadData: UserStockData = useLoaderData();
-  console.log("Loader Data:", loadData);
+  console.log("Loader Data for", loadData.userId);
   const [userStockData, setUserStockData] = useState(loadData); // 确保数据在组件中可用
 
   // 自动刷新逻辑
