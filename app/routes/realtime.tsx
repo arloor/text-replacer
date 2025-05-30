@@ -52,9 +52,9 @@ export function RealtimeComponent({
   return (
     <div className=" mx-auto p-4">
       <div className="flex flex-col sm:flex-row justify-end items-center mt-4 mb-4 gap-4 sm:gap-2">
-        <div className="flex flex-row jutify-start items-center gap-2">
+        {/* <div className="flex flex-row jutify-start items-center gap-2">
           <TopNavigation />
-        </div>
+        </div> */}
         <div className="flex flex-row justify-between items-center gap-2 sm:mr-auto">
           <StatsDisplay stats={statsData} colored={colored} />
         </div>
