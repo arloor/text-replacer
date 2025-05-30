@@ -6,4 +6,5 @@ export default [
   route("logout","routes/logout.tsx"),
   route("realtime", "routes/realtime.tsx"),
   route("stock-manager", "routes/stock-manager.tsx"), // 股票列表管理页面
+  route("data", "routes/data.tsx"), // 数据加载页面
 ] satisfies RouteConfig;
