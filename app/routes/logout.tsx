@@ -1,5 +1,5 @@
 import { Form, Link, redirect } from "react-router-dom";
-import { getSession, destroySession } from "../sessions.server";
+import { getSession, destroySession } from "../functions/sessions.server";
 import type { Route } from "./+types/logout";
 
 export async function action({ request }: Route.ActionArgs) {

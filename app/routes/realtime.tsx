@@ -9,14 +9,10 @@ import type { StockEntry, StockHqData } from "../types/real-time";
 import { TopNavigation } from "~/components/TopNavigation";
 import { StockTableView } from "~/components/realtime/StockTableView";
 import { StatsDisplay } from "~/components/realtime/StatsDisplay";
-import {
-  calculateTotalStats,
-  fetchAStocks,
-  fetchHKStocks,
-} from "~/components/realtime/stockUtils";
 import type { Route } from "./+types";
-import { getSession } from "~/sessions.server";
+import { getSession } from "~/functions/sessions.server";
 import { useEffect } from "react";
+import { loadData } from "~/functions/loader.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -31,61 +27,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!session.has("userId")) {
     return redirect("/login");
   }
-  try {
-    const response = await fetch(
-      "http://tt.arloor.com:5000/user-stocks/" + session.get("userId"),
-      {
-        method: "GET",
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("无法加载股票列表");
-    }
-
-    const stockCells: StockEntry[] = await response.json();
-    // 区分A股和港股
-    const aCodes = stockCells.filter((cell) => /^(bj|sh|sz)/.test(cell.code));
-    const hkCodes = stockCells.filter((cell) => /^(hk)/.test(cell.code));
-
-    // 并行获取A股和港股数据
-    const [aStocksData, hkStocksData] = await Promise.all([
-      fetchAStocks(aCodes),
-      fetchHKStocks(hkCodes),
-    ]);
-
-    // 合并数据
-    const allStocksData = [...aStocksData, ...hkStocksData];
-
-    // 根据stockCells的顺序排序数据
-    allStocksData.sort((a, b) => {
-      if (!a || !b) {
-        if (!a && !b) return 0;
-        if (!a) return 1;
-        return -1;
-      }
-      const aIndex = stockCells.findIndex(
-        (c) => c.code === `${a.market}${a.code}`
-      );
-      const bIndex = stockCells.findIndex(
-        (c) => c.code === `${b.market}${b.code}`
-      );
-      return aIndex - bIndex;
-    });
-    const statsData = calculateTotalStats(allStocksData);
-    return data({
-      error: session.get("error"),
-      userId: session.get("userId"),
-      stockCells,
-      allStocksData,
-      statsData,
-    });
-  } catch (err) {
-    console.error("加载股票列表失败:", err);
-    return data({
-      error: err,
-    });
-  }
+  const userId = session.get("userId");
+  const userStockData = await loadData(userId);
+  return data({ ...userStockData, userId: userId });
 }
 
 // 客户端渲染的主组件
@@ -108,7 +52,7 @@ export default function RealtimePage() {
     };
   }, [isAutoRefresh]);
   const loaderData = useLoaderData();
-  // console.log("Loader Data:", loaderData);
+  console.log("Loader Data:", loaderData);
   const userId = loaderData.userId || "";
   console.log("User ID:", userId);
   const error = loaderData.error || "";

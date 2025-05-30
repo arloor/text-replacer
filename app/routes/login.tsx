@@ -1,8 +1,11 @@
 import { data, redirect } from "react-router";
 import type { Route } from "./+types/login";
 
-import { getSession, commitSession } from "../sessions.server";
-import { validateCredentials } from "../auth.server";
+import {
+  getSession,
+  commitSession,
+  validateCredentials,
+} from "../functions/sessions.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));

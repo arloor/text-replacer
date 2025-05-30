@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { StockEntry } from "../types/real-time";
 import { TopNavigation } from "~/components/TopNavigation";
 import type { Route } from "./+types";
-import { getSession } from "~/sessions.server";
+import { getSession } from "~/functions/sessions.server";
 import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 
@@ -100,7 +100,7 @@ export default function StockManagerPage() {
       showToast("保存成功", "success");
 
       // 刷新页面来获取最新数据
-    //   navigate(0);
+      //   navigate(0);
     } catch (error) {
       console.error("Failed to save stock:", error);
       showToast(
