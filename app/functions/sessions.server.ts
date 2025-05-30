@@ -58,8 +58,12 @@ export async function validateCredentials(
   // 3. 永远不要存储明文密码
 
   // 这是一个简化的示例 - 请替换为实际的身份验证逻辑
-  if (username === "admin" && password === "liuganghuan") {
-    return "admin@arloor.com"; // 身份验证成功时返回用户ID
+  if (username === "admin@arloor.com" && password === "arloorgood") {
+    return username; // 身份验证成功时返回用户ID
+  }
+
+    if(username === "admin@x.com" && password === "admin"){
+    return username; // 身份验证成功时返回用户ID
   }
 
   // 身份验证失败
