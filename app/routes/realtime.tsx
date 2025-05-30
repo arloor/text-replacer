@@ -1,5 +1,6 @@
 import {
   data,
+  Link,
   redirect,
   useLoaderData,
   useSearchParams,
@@ -12,6 +13,8 @@ import type { Route } from "./+types";
 import { getSession } from "~/functions/sessions.server";
 import { useCallback, useEffect, useState } from "react";
 import { loadData, type UserStockData } from "~/functions/loader.server";
+import { useToast } from "~/components/ui/toaster";
+import { LogoutButton } from "./logout";
 
 export const meta: MetaFunction = () => {
   return [
@@ -47,13 +50,16 @@ export function RealtimeComponent({
   console.log("User ID:", userId);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className=" mx-auto p-4">
       <div className="flex flex-col sm:flex-row justify-end items-center mt-4 mb-4 gap-4 sm:gap-2">
         <div className="flex flex-row jutify-start items-center gap-2">
           <TopNavigation />
         </div>
-        <div className="flex flex-row justify-end items-center gap-2 sm:mr-auto">
+        <div className="flex flex-row justify-between items-center gap-2 sm:mr-auto">
           <StatsDisplay stats={statsData} colored={colored} />
+        </div>
+        <div className="flex flex-row justify-end items-center gap-2">
+          <LogoutButton />
         </div>
       </div>
       {error ? (
@@ -77,7 +83,7 @@ export function RealtimeComponent({
           />
         </>
       )}
-      <div className="flex justify-center sm:justify-start mt-4">
+      <div className="flex justify-center sm:justify-start mt-4 gap-4">
         <a
           href="/stock-manager"
           className="mb-4 px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
@@ -110,6 +116,8 @@ export default function RealtimePage() {
     };
   }, []);
 
+  const { addToast } = useToast();
+
   // 获取数据的函数
   const fetchData = useCallback(async () => {
     try {
@@ -125,9 +133,17 @@ export default function RealtimePage() {
       setUserStockData(newData);
     } catch (err) {
       console.error("获取数据失败:", err);
+
+      // 显示错误提示
+      addToast({
+        title: "数据获取失败",
+        description:
+          err instanceof Error ? err.message : "请检查网络连接或稍后再试",
+        type: "error",
+      });
     } finally {
     }
-  }, []);
+  }, [addToast]);
 
   const [searchParams] = useSearchParams();
   const colored = searchParams.get("colored") !== "false"; // 默认为true

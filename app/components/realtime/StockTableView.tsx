@@ -32,7 +32,7 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
             stock ? (
               <tr
                 key={codes[index].code}
-                className={`border-b ${
+                className={`border-b hover:bg-gray-200 transition-colors duration-100 ${
                   !colored && parseFloat(stock.changePercent) < 0
                     ? "bg-gray-100"
                     : ""
