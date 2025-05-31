@@ -1,5 +1,5 @@
 podman build . -f Dockerfile -t quay.io/arloor/text-replacer:stock --network host
-podman login quay.io  
+# podman login quay.io  
 podman push quay.io/arloor/text-replacer:stock 
 ssh root@tt.arloor.com '
 docker stop stock-vite

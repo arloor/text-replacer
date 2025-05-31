@@ -146,7 +146,7 @@ export default function RealtimePage() {
       addToast(toast);
       setTimeout(() => {
         removeToast(toast.id);
-      }, INTERVAL_IN_MILLISECONDS);
+      }, (INTERVAL_IN_MILLISECONDS / 3) * 2);
     }
   }, [addToast, removeToast]);
 
