@@ -13,18 +13,18 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
       <table className="min-w-[200px] table-auto">
         <thead>
           <tr className="bg-gray-100 text-left">
-            <th className="px-4 py-2 min-w-16">名称代码</th>
-            <th className="px-4 py-2">当前价</th>
-            <th className="px-4 py-2">涨跌幅</th>
-            <th className="px-4 py-2">涨跌额</th>
-            <th className="px-4 py-2">今日盈亏</th>
-            <th className="px-4 py-2">最高</th>
-            <th className="px-4 py-2">最低</th>
-            <th className="px-4 py-2">持仓金额</th>
-            <th className="px-4 py-2">持仓(手)</th>
-            <th className="px-4 py-2">周同比</th>
-            <th className="px-4 py-2">月同比</th>
-            <th className="px-4 py-2">时间</th>
+            <th className="px-2 py-2 min-w-[70px] break-words">名称代码</th>
+            <th className="px-2 py-2 min-w-[60px] break-words">当前价</th>
+            <th className="px-2 py-2 min-w-[60px] break-words">涨跌幅</th>
+            <th className="px-2 py-2 min-w-[60px] break-words">涨跌额</th>
+            <th className="px-2 py-2 min-w-[70px] break-words">今日盈亏</th>
+            <th className="px-2 py-2 ">最高</th>
+            <th className="px-2 py-2 ">最低</th>
+            <th className="px-2 py-2 ">持仓金额</th>
+            <th className="px-2 py-2 ">持仓(手)</th>
+            <th className="px-2 py-2 ">周同比</th>
+            <th className="px-2 py-2 ">月同比</th>
+            <th className="px-2 py-2 ">时间</th>
           </tr>
         </thead>
         <tbody>
@@ -38,7 +38,7 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
                     : ""
                 }`}
               >
-                <td className="px-4 py-2">
+                <td className="px-2 py-2 break-words">
                   <a
                     className="hidden sm:block"
                     target="_blank"
@@ -60,7 +60,7 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
                   </a>
                 </td>
                 <td
-                  className={`px-4 py-2 ${
+                  className={`px-2 py-2 break-words ${
                     colored
                       ? parseFloat(stock.changePercent) >= 0
                         ? "text-red-500"
@@ -73,7 +73,7 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
                   </strong>
                 </td>
                 <td
-                  className={`px-4 py-2 ${
+                  className={`px-2 py-2 break-words ${
                     colored
                       ? parseFloat(stock.changePercent) >= 0
                         ? "text-red-500"
@@ -86,7 +86,7 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
                   </strong>
                 </td>
                 <td
-                  className={`px-4 py-2 ${
+                  className={`px-2 py-2 break-words ${
                     colored
                       ? parseFloat(stock.changePercent) >= 0
                         ? "text-red-500"
@@ -97,7 +97,7 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
                   <strong>{stock.price === 0 ? "-" : stock.priceChange}</strong>
                 </td>
                 <td
-                  className={`px-4 py-2 ${
+                  className={`px-2 py-2 break-words ${
                     colored
                       ? parseFloat(stock.changePercent) >= 0
                         ? "text-red-500"
@@ -107,12 +107,12 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
                 >
                   <strong>{stock.profit || "-"}</strong>
                 </td>
-                <td className="px-4 py-2">{stock.high}</td>
-                <td className="px-4 py-2">{stock.low}</td>
-                <td className="px-4 py-2">{stock.positionValue || "-"}</td>
-                <td className="px-4 py-2">{stock.count || "-"}</td>
+                <td className="px-2 py-2 ">{stock.high}</td>
+                <td className="px-2 py-2 ">{stock.low}</td>
+                <td className="px-2 py-2 ">{stock.positionValue || "-"}</td>
+                <td className="px-2 py-2 ">{stock.count || "-"}</td>
                 <td
-                  className={`px-4 py-2 ${
+                  className={`px-2 py-2  ${
                     colored
                       ? stock.weeklyChange &&
                         parseFloat(stock.weeklyChange) >= 0
@@ -126,7 +126,7 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
                   </strong>
                 </td>
                 <td
-                  className={`px-4 py-2 ${
+                  className={`px-2 py-2  ${
                     colored
                       ? stock.monthlyChange &&
                         parseFloat(stock.monthlyChange) >= 0
@@ -139,13 +139,13 @@ export function StockTableView({ stocksData, codes, colored }: Props) {
                     {stock.monthlyChange ? `${stock.monthlyChange}%` : "-"}
                   </strong>
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-2 py-2 ">
                   {stock.date} {stock.time}
                 </td>
               </tr>
             ) : (
               <tr key={codes[index].code}>
-                <td colSpan={12} className="px-4 py-2 text-center">
+                <td colSpan={12} className="px-2 py-2 text-center">
                   无数据
                 </td>
               </tr>

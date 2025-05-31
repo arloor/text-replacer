@@ -1,6 +1,5 @@
 import {
   data,
-  Link,
   redirect,
   useLoaderData,
   useSearchParams,
@@ -15,6 +14,8 @@ import { useCallback, useEffect, useState } from "react";
 import { loadData, type UserStockData } from "~/functions/loader.server";
 import { useToast } from "~/components/ui/toaster";
 import { LogoutButton } from "./logout";
+
+const INTERVAL_IN_MILLISECONDS = 3000; // 3秒
 
 export const meta: MetaFunction = () => {
   return [
@@ -107,7 +108,7 @@ export default function RealtimePage() {
 
     intervalId = window.setInterval(() => {
       fetchData();
-    }, 3000); // 30秒刷新一次
+    }, INTERVAL_IN_MILLISECONDS); // 30秒刷新一次
 
     return () => {
       if (intervalId) {
@@ -116,7 +117,7 @@ export default function RealtimePage() {
     };
   }, []);
 
-  const { addToast } = useToast();
+  const { addToast, removeToast } = useToast();
 
   // 获取数据的函数
   const fetchData = useCallback(async () => {
@@ -135,15 +136,19 @@ export default function RealtimePage() {
       console.error("获取数据失败:", err);
 
       // 显示错误提示
-      addToast({
+      const toast = {
+        id: crypto.randomUUID(),
         title: "数据获取失败",
         description:
           err instanceof Error ? err.message : "请检查网络连接或稍后再试",
-        type: "error",
-      });
-    } finally {
+        type: "error" as const,
+      };
+      addToast(toast);
+      setTimeout(() => {
+        removeToast(toast.id);
+      }, INTERVAL_IN_MILLISECONDS);
     }
-  }, [addToast]);
+  }, [addToast, removeToast]);
 
   const [searchParams] = useSearchParams();
   const colored = searchParams.get("colored") !== "false"; // 默认为true
