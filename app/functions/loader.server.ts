@@ -15,7 +15,7 @@ export async function loadData(userId: string | undefined): Promise<UserStockDat
   }
   try {
     const response = await fetch(
-      "http://tt.arloor.com:5000/user-stocks/" + userId,
+      "https://tt.arloor.com:5000/user-stocks/" + userId,
       {
         method: "GET",
       }

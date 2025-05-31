@@ -34,10 +34,10 @@ export function Panel({ dateRange, distinctCode }: PanelProps) {
           };
           const body = JSON.stringify(req_body);
           console.log(
-            `curl http://tt.arloor.com:5000/data -H "content-type: application/json" -d '${body}'`
+            `curl https://tt.arloor.com:5000/data -H "content-type: application/json" -d '${body}'`
           );
 
-          const response = await fetch("http://tt.arloor.com:5000/data", {
+          const response = await fetch("https://tt.arloor.com:5000/data", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

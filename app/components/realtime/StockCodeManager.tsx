@@ -26,7 +26,7 @@ export function StockCodeManager({ stockCells }: { stockCells: StockEntry[] }) {
   const handleSave = async () => {
     try {
       // 发送数据到服务器
-      const response = await fetch("http://tt.arloor.com:5000/save-stocks", {
+      const response = await fetch("https://tt.arloor.com:5000/save-stocks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
