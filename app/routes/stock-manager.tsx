@@ -197,165 +197,167 @@ export default function StockManagerPage() {
         <TopNavigation />
       </div>
 
-      {error ? (
+      {/* 错误信息显示区域 */}
+      {error && (
         <div className="rounded-lg border p-6 shadow-sm bg-red-50 text-red-600 mb-4">
           <h2 className="mb-2 text-xl font-semibold">{error}</h2>
           <p>请检查网络连接或稍后再试。</p>
         </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <div className="mb-6">
-            <h2 className="text-lg font-medium mb-2">股票列表管理说明</h2>
-            <ul className="list-disc list-inside space-y-1 text-gray-600">
-              <li>您可以添加、删除、编辑和排序您的股票列表</li>
-              <li>支持A股（sh/sz/bj）和港股（hk）股票代码</li>
-              <li>可以设置持仓数量（单位：手）以计算收益</li>
-              <li>修改后请点击"保存更改"按钮使修改生效</li>
-            </ul>
-          </div>
-
-          <div className="mb-4">
-            <h3 className="font-bold mb-4 text-gray-900 text-lg">
-              当前股票列表：
-            </h3>
-            {entries.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">
-                暂无股票数据，请添加股票
-              </p>
-            ) : (
-              entries.map((entry, index) => (
-                <div key={index} className="flex items-center gap-2 mb-3 py-2">
-                  {/* 移动按钮列 */}
-                  <div className="flex gap-1 w-16">
-                    {index > 0 && (
-                      <button
-                        onClick={() => handleMoveUp(index)}
-                        className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-                        title="上移"
-                      >
-                        <ChevronUpIcon className="w-5 h-5" />
-                      </button>
-                    )}
-                    {index < entries.length - 1 && (
-                      <button
-                        onClick={() => handleMoveDown(index)}
-                        className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-                        title="下移"
-                      >
-                        <ChevronDownIcon className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* 股票代码列 */}
-                  <div className="w-28">
-                    <span className="text-gray-900">{entry.code}</span>
-                  </div>
-
-                  {/* 持仓数量列 */}
-                  <div className="w-24">
-                    {editIndex === index ? (
-                      <input
-                        type="number"
-                        value={editCount}
-                        onChange={(e) => setEditCount(e.target.value)}
-                        className="w-full px-2 py-1 border rounded text-gray-900"
-                        min="0"
-                        placeholder="持仓数量"
-                      />
-                    ) : (
-                      <span className="text-gray-600">
-                        ({entry.count || 0}手)
-                      </span>
-                    )}
-                  </div>
-
-                  {/* 操作按钮列 */}
-                  <div className="flex gap-2">
-                    {editIndex === index ? (
-                      <>
-                        <button
-                          onClick={() => handleSaveEdit(index)}
-                          className="px-3 py-1 text-sm text-gray-700 hover:text-gray-900 border border-gray-300 rounded"
-                        >
-                          保存
-                        </button>
-                        <button
-                          onClick={handleCancelEdit}
-                          className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded"
-                        >
-                          取消
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleStartEdit(index, entry.count)}
-                          className="px-3 py-1 text-sm border border-gray-300 bg-gray-50 text-gray-700 rounded hover:bg-gray-100 hover:border-gray-400"
-                        >
-                          编辑
-                        </button>
-                        <button
-                          onClick={() => handleDelete(index)}
-                          className="px-3 py-1 text-sm border border-red-200 bg-red-50 text-red-500 rounded hover:bg-red-100 hover:border-red-300"
-                        >
-                          删除
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          <div className="flex gap-2 mb-6 border-t pt-4">
-            <input
-              type="text"
-              value={newCode}
-              onChange={(e) => setNewCode(e.target.value)}
-              placeholder="代码(sz000001)"
-              className="px-2 py-1 border rounded text-gray-900 w-36"
-            />
-            <input
-              type="number"
-              value={newCount}
-              onChange={(e) => setNewCount(e.target.value)}
-              placeholder="持仓数量(手)"
-              className="px-2 py-1 border rounded w-32 text-gray-900"
-              min="0"
-            />
-            <button
-              onClick={handleAdd}
-              className="px-4 py-1 bg-gray-800 text-white rounded hover:bg-gray-700"
-            >
-              添加
-            </button>
-          </div>
-
-          <div className="flex justify-start gap-2 mt-8">
-            <a
-              href="/realtime"
-              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-            >
-              返回实时数据
-            </a>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              保存更改
-            </button>
-          </div>
-        </div>
       )}
+
+      {/* 股票管理区域 */}
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <div className="mb-6">
+          <h2 className="text-lg font-medium mb-2">股票列表管理说明</h2>
+          <ul className="list-disc list-inside space-y-1 text-gray-600">
+            <li>您可以添加、删除、编辑和排序您的股票列表</li>
+            <li>支持A股（sh/sz/bj）和港股（hk）股票代码</li>
+            <li>可以设置持仓数量（单位：手）以计算收益</li>
+            <li>修改后请点击"保存更改"按钮使修改生效</li>
+          </ul>
+        </div>
+
+        <div className="mb-4">
+          <h3 className="font-bold mb-4 text-gray-900 text-lg">
+            当前股票列表：
+          </h3>
+          {entries.length === 0 && (
+            <p className="text-gray-500 text-center py-4">
+              暂无股票数据，请添加股票
+            </p>
+          )}
+          {entries.length > 0 &&
+            entries.map((entry, index) => (
+              <div key={index} className="flex items-center gap-2 mb-3 py-2">
+                {/* 移动按钮列 */}
+                <div className="flex gap-1 w-16">
+                  {index > 0 && (
+                    <button
+                      onClick={() => handleMoveUp(index)}
+                      className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                      title="上移"
+                    >
+                      <ChevronUpIcon className="w-5 h-5" />
+                    </button>
+                  )}
+                  {index < entries.length - 1 && (
+                    <button
+                      onClick={() => handleMoveDown(index)}
+                      className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                      title="下移"
+                    >
+                      <ChevronDownIcon className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* 股票代码列 */}
+                <div className="w-28">
+                  <span className="text-gray-900">{entry.code}</span>
+                </div>
+
+                {/* 持仓数量列 */}
+                <div className="w-24">
+                  {editIndex === index ? (
+                    <input
+                      type="number"
+                      value={editCount}
+                      onChange={(e) => setEditCount(e.target.value)}
+                      className="w-full px-2 py-1 border rounded text-gray-900"
+                      min="0"
+                      placeholder="持仓数量"
+                    />
+                  ) : (
+                    <span className="text-gray-600">
+                      ({entry.count || 0}手)
+                    </span>
+                  )}
+                </div>
+
+                {/* 操作按钮列 */}
+                <div className="flex gap-2">
+                  {editIndex === index ? (
+                    <>
+                      <button
+                        onClick={() => handleSaveEdit(index)}
+                        className="px-3 py-1 text-sm text-gray-700 hover:text-gray-900 border border-gray-300 rounded"
+                      >
+                        保存
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded"
+                      >
+                        取消
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleStartEdit(index, entry.count)}
+                        className="px-3 py-1 text-sm border border-gray-300 bg-gray-50 text-gray-700 rounded hover:bg-gray-100 hover:border-gray-400"
+                      >
+                        编辑
+                      </button>
+                      <button
+                        onClick={() => handleDelete(index)}
+                        className="px-3 py-1 text-sm border border-red-200 bg-red-50 text-red-500 rounded hover:bg-red-100 hover:border-red-300"
+                      >
+                        删除
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+        </div>
+
+        <div className="flex gap-2 mb-6 border-t pt-4">
+          <input
+            type="text"
+            value={newCode}
+            onChange={(e) => setNewCode(e.target.value)}
+            placeholder="代码(sz000001)"
+            className="px-2 py-1 border rounded text-gray-900 w-36"
+          />
+          <input
+            type="number"
+            value={newCount}
+            onChange={(e) => setNewCount(e.target.value)}
+            placeholder="持仓数量(手)"
+            className="px-2 py-1 border rounded w-32 text-gray-900"
+            min="0"
+          />
+          <button
+            onClick={handleAdd}
+            className="px-4 py-1 bg-gray-800 text-white rounded hover:bg-gray-700"
+          >
+            添加
+          </button>
+        </div>
+
+        <div className="flex justify-start gap-2 mt-8">
+          <a
+            href="/realtime"
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+          >
+            返回实时数据
+          </a>
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            保存更改
+          </button>
+        </div>
+      </div>
 
       {/* Toast提示消息 */}
       {toast && (
         <div
           className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow text-white ${
-            toast.type === "success" ? "bg-green-500" : "bg-red-500"
-          }`}
+            toast.type === "success" && "bg-green-500"
+          } ${toast.type === "error" && "bg-red-500"}`}
         >
           {toast.text}
         </div>
