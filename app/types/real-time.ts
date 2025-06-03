@@ -24,6 +24,7 @@ export interface StockHqData {
   weeklyChange?: string; // 周同比涨幅
   monthlyChange?: string; // 月同比涨幅
   hkdCnyRate?: string; // 港币兑人民币汇率
+  lotSize?: number; // 每手股数
 }
 
 // 股票历史数据缓存

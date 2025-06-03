@@ -1,7 +1,7 @@
-import { data, redirect, useLoaderData } from "react-router-dom";
+import { data, redirect, useLoaderData, useLocation } from "react-router-dom";
 import type { MetaFunction } from "react-router";
-import { useState } from "react";
-import type { StockEntry } from "../types/real-time";
+import { useState, useEffect } from "react";
+import type { StockEntry, StockHqData } from "../types/real-time";
 import { TopNavigation } from "~/components/TopNavigation";
 import type { Route } from "./+types";
 import { getSession } from "~/functions/sessions.server";
@@ -54,6 +54,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 // 客户端渲染的主组件
 export default function StockManagerPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const loaderData = useLoaderData();
   const userId = loaderData.userId || "";
   const error = loaderData.error || "";
@@ -69,6 +70,51 @@ export default function StockManagerPage() {
     text: string;
     type: "success" | "error";
   } | null>(null);
+
+  // 存储从realtime页面传递过来的股票详细信息
+  const [stockDetailsMap, setStockDetailsMap] = useState<
+    Record<string, StockHqData>
+  >({});
+
+  useEffect(() => {
+    // 从location.state中获取股票数据
+    if (location.state && location.state.stockData) {
+      const stockData = location.state.stockData as StockHqData[];
+      // 将股票数据转换为以code为键的对象
+      const stockMap: Record<string, StockHqData> = {};
+      stockData.forEach((stock) => {
+        if (stock && stock.code) {
+          stockMap[`${stock.market}${stock.code}`.toLowerCase()] = stock;
+        }
+      });
+      setStockDetailsMap(stockMap);
+    }
+  }, [location.state]);
+
+  // 计算持仓金额的函数
+  const calculatePositionValue = (code: string, count?: number): string => {
+    if (!count) return "-";
+    const stockDetails = stockDetailsMap[code.toLowerCase()];
+    if (!stockDetails || stockDetails.price === 0) return "-";
+    
+    // 港股和A股处理方式不同
+    if (code.toLowerCase().startsWith("hk")) {
+      // 港股：每只股票的每手股数不同
+      if (stockDetails.positionValue && count === stockDetails.count) {
+        // 如果持仓数量没变且已有计算好的持仓金额，直接使用
+        return stockDetails.positionValue;
+      } else if (stockDetails.lotSize) {
+        // 如果有每手股数信息，使用实际每手股数计算
+        // 港股还需要考虑汇率
+        const hkdCnyRate = stockDetails.hkdCnyRate ? parseFloat(stockDetails.hkdCnyRate) : 0.934; // 默认汇率
+        return (stockDetails.price * count * stockDetails.lotSize * hkdCnyRate).toFixed(2);
+      }
+      return "-";
+    } else {
+      // A股：统一按照100股/手计算
+      return (stockDetails.price * count * 100).toFixed(2);
+    }
+  };
 
   // 显示临时提示的函数
   const showToast = (text: string, type: "success" | "error" = "success") => {
@@ -127,13 +173,17 @@ export default function StockManagerPage() {
       return;
     }
 
-    setEntries([
-      ...entries,
-      {
-        code: normalizedCode,
-        count: newCount ? parseInt(newCount) : undefined,
-      },
-    ]);
+    // 添加新股票
+    const newEntry = {
+      code: normalizedCode,
+      count: newCount ? parseInt(newCount) : undefined,
+    };
+
+    setEntries([...entries, newEntry]);
+
+    // 如果这个股票代码在stockDetailsMap中不存在，可以尝试从API获取数据
+    // 这里简化处理，实际项目中可能需要异步请求股票数据
+
     setNewCode("");
     setNewCount("");
   };
@@ -154,12 +204,17 @@ export default function StockManagerPage() {
   // 保存编辑
   const handleSaveEdit = (index: number) => {
     const newEntries = [...entries];
+    const newCount = editCount ? parseInt(editCount) : undefined;
+
     newEntries[index] = {
       ...newEntries[index],
-      count: editCount ? parseInt(editCount) : undefined,
+      count: newCount,
     };
+
     setEntries(newEntries);
     setEditIndex(null);
+
+    // 当持仓数量变化时，持仓金额会通过calculatePositionValue自动更新
   };
 
   // 取消编辑
@@ -213,6 +268,7 @@ export default function StockManagerPage() {
             <li>您可以添加、删除、编辑和排序您的股票列表</li>
             <li>支持A股（sh/sz/bj）和港股（hk）股票代码</li>
             <li>可以设置持仓数量（单位：手）以计算收益</li>
+            <li>A股统一按照100股/手计算，港股按照实际每手股数计算</li>
             <li>修改后请点击"保存更改"按钮使修改生效</li>
           </ul>
         </div>
@@ -225,6 +281,15 @@ export default function StockManagerPage() {
             <p className="text-gray-500 text-center py-4">
               暂无股票数据，请添加股票
             </p>
+          )}
+          {entries.length > 0 && (
+            <div className="flex items-center gap-2 mb-2 pb-2 border-b text-sm text-gray-500">
+              <div className="w-16"></div>
+              <div className="w-40">股票代码/名称</div>
+              <div className="w-24">持仓数量</div>
+              <div className="w-32">持仓金额 (元)</div>
+              <div className="w-24">每手股数</div>
+            </div>
           )}
           {entries.length > 0 &&
             entries.map((entry, index) => (
@@ -251,9 +316,16 @@ export default function StockManagerPage() {
                   )}
                 </div>
 
-                {/* 股票代码列 */}
-                <div className="w-28">
-                  <span className="text-gray-900">{entry.code}</span>
+                {/* 股票代码与名称列 */}
+                <div className="w-40">
+                  <span className="text-gray-900 font-medium">
+                    {entry.code}
+                  </span>
+                  {stockDetailsMap[entry.code.toLowerCase()] && (
+                    <span className="text-gray-500 ml-1">
+                      ({stockDetailsMap[entry.code.toLowerCase()].name})
+                    </span>
+                  )}
                 </div>
 
                 {/* 持仓数量列 */}
@@ -272,6 +344,27 @@ export default function StockManagerPage() {
                       ({entry.count || 0}手)
                     </span>
                   )}
+                </div>
+
+                {/* 持仓金额列 */}
+                <div className="w-32">
+                  <span className="text-gray-600">
+                    {editIndex === index
+                      ? calculatePositionValue(
+                          entry.code,
+                          editCount ? parseInt(editCount) : undefined
+                        )
+                      : calculatePositionValue(entry.code, entry.count)}
+                  </span>
+                </div>
+
+                {/* 每手股数列 */}
+                <div className="w-24">
+                  <span className="text-gray-500">
+                    {entry.code.toLowerCase().startsWith("hk") && stockDetailsMap[entry.code.toLowerCase()]?.lotSize
+                      ? `${stockDetailsMap[entry.code.toLowerCase()].lotSize}股/手`
+                      : "100股/手"}
+                  </span>
                 </div>
 
                 {/* 操作按钮列 */}

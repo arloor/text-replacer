@@ -3,6 +3,7 @@ import {
   redirect,
   useLoaderData,
   useSearchParams,
+  useNavigate,
 } from "react-router-dom";
 import type { MetaFunction } from "react-router";
 import { TopNavigation } from "~/components/TopNavigation";
@@ -48,7 +49,16 @@ export function RealtimeComponent({
   error = "",
 }: RealtimeProps) {
   const { userId, stockCells, allStocksData, statsData } = data;
+  const navigate = useNavigate();
   console.log("User ID:", userId);
+
+  const handleNavigateToStockManager = () => {
+    navigate("/stock-manager", {
+      state: {
+        stockData: allStocksData.filter(Boolean), // 过滤掉null值
+      },
+    });
+  };
 
   return (
     <div className=" mx-auto p-4">
@@ -85,12 +95,12 @@ export function RealtimeComponent({
         </>
       )}
       <div className="flex justify-center sm:justify-start mt-4 gap-4">
-        <a
-          href="/stock-manager"
+        <button
+          onClick={handleNavigateToStockManager}
           className="mb-4 px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
         >
           设置股票
-        </a>
+        </button>
       </div>
     </div>
   );

@@ -153,6 +153,7 @@ export async function parseAStockHQData(
       count && currentPrice
         ? (currentPrice * count * 100).toFixed(2)
         : undefined,
+    lotSize: 100, // A股统一每手100股
     wapHref: `https://wap.eastmoney.com/quote/stock/${market === "sz" ? "0" : "1"}.${code}.html`,
     url: `https://quote.eastmoney.com/${market}${code}.html`,
     weeklyChange, // 周同比
@@ -388,6 +389,7 @@ export async function fetchHKStocks(
           profit: profitWithRate,
           positionValue: positionValueWithRate,
           hkdCnyRate: hkdCnyRate.toFixed(4), // 存储当前使用的汇率
+          lotSize: numMeiShou, // 港股每手股数
           wapHref: `https://wap.eastmoney.com/quote/stock/116.${code}.html`,
           url: `https://quote.eastmoney.com/hk/${code}.html`,
         };
