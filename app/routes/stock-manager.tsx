@@ -250,7 +250,7 @@ export default function StockManagerPage() {
     <div className="container mx-auto p-4">
       <div className="flex flex-col sm:flex-row justify-between items-center mt-4 mb-6 gap-4">
         <h1 className="text-2xl font-bold">股票列表管理</h1>
-        <TopNavigation />
+        {/* <TopNavigation /> */}
       </div>
 
       {/* 错误信息显示区域 */}
@@ -263,7 +263,7 @@ export default function StockManagerPage() {
 
       {/* 股票管理区域 */}
       <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <h2 className="text-lg font-medium mb-2">股票列表管理说明</h2>
           <ul className="list-disc list-inside space-y-1 text-gray-600">
             <li>您可以添加、删除、编辑和排序您的股票列表</li>
@@ -273,7 +273,7 @@ export default function StockManagerPage() {
             <li>港股持仓金额会考虑人民币与港币汇率换算</li>
             <li>修改后请点击"保存更改"按钮使修改生效</li>
           </ul>
-        </div>
+        </div> */}
 
         <div className="mb-4">
           <h3 className="font-bold mb-4 text-gray-900 text-lg">
