@@ -96,24 +96,25 @@ export default function StockManagerPage() {
     if (!count) return "-";
     const stockDetails = stockDetailsMap[code.toLowerCase()];
     if (!stockDetails || stockDetails.price === 0) return "-";
-    
-    // 港股和A股处理方式不同
-    if (code.toLowerCase().startsWith("hk")) {
-      // 港股：每只股票的每手股数不同
-      if (stockDetails.positionValue && count === stockDetails.count) {
-        // 如果持仓数量没变且已有计算好的持仓金额，直接使用
-        return stockDetails.positionValue;
-      } else if (stockDetails.lotSize) {
-        // 如果有每手股数信息，使用实际每手股数计算
-        // 港股还需要考虑汇率
-        const hkdCnyRate = stockDetails.hkdCnyRate ? parseFloat(stockDetails.hkdCnyRate) : 0.934; // 默认汇率
-        return (stockDetails.price * count * stockDetails.lotSize * hkdCnyRate).toFixed(2);
-      }
-      return "-";
-    } else {
-      // A股：统一按照100股/手计算
-      return (stockDetails.price * count * 100).toFixed(2);
+
+    // 如果持仓数量没变且已有计算好的持仓金额，直接使用
+    if (stockDetails.positionValue && count === stockDetails.count) {
+      return stockDetails.positionValue;
     }
+
+    // 获取每手股数，默认为100股/手
+    const lotSize = stockDetails.lotSize || 100;
+
+    // 计算持仓金额，港股需要乘以汇率
+    const isHkStock = code.toLowerCase().startsWith("hk");
+    const exchangeRate =
+      isHkStock && stockDetails.hkdCnyRate
+        ? parseFloat(stockDetails.hkdCnyRate)
+        : isHkStock
+        ? 0.934
+        : 1; // 港股使用汇率，A股汇率为1
+
+    return (stockDetails.price * count * lotSize * exchangeRate).toFixed(2);
   };
 
   // 显示临时提示的函数
@@ -268,7 +269,8 @@ export default function StockManagerPage() {
             <li>您可以添加、删除、编辑和排序您的股票列表</li>
             <li>支持A股（sh/sz/bj）和港股（hk）股票代码</li>
             <li>可以设置持仓数量（单位：手）以计算收益</li>
-            <li>A股统一按照100股/手计算，港股按照实际每手股数计算</li>
+            <li>股票会根据实际每手股数计算，默认为100股/手</li>
+            <li>港股持仓金额会考虑人民币与港币汇率换算</li>
             <li>修改后请点击"保存更改"按钮使修改生效</li>
           </ul>
         </div>
@@ -361,8 +363,10 @@ export default function StockManagerPage() {
                 {/* 每手股数列 */}
                 <div className="w-24">
                   <span className="text-gray-500">
-                    {entry.code.toLowerCase().startsWith("hk") && stockDetailsMap[entry.code.toLowerCase()]?.lotSize
-                      ? `${stockDetailsMap[entry.code.toLowerCase()].lotSize}股/手`
+                    {stockDetailsMap[entry.code.toLowerCase()]?.lotSize
+                      ? `${
+                          stockDetailsMap[entry.code.toLowerCase()].lotSize
+                        }股/手`
                       : "100股/手"}
                   </span>
                 </div>
