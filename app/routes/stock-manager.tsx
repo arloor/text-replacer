@@ -275,7 +275,7 @@ export default function StockManagerPage() {
           </ul>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 overflow-x-auto">
           <h3 className="font-bold mb-4 text-gray-900 text-lg">
             当前股票列表：
           </h3>
