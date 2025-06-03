@@ -285,164 +285,199 @@ export default function StockManagerPage() {
             </p>
           )}
           {entries.length > 0 && (
-            <div className="flex items-center gap-2 mb-2 pb-2 border-b text-sm text-gray-500">
-              <div className="w-16"></div>
-              <div className="w-40">股票代码/名称</div>
-              <div className="w-24">持仓数量</div>
-              <div className="w-32">持仓金额 (元)</div>
-              <div className="w-24">每手股数</div>
-            </div>
+            <table className="min-w-full border-collapse">
+              <thead>
+                <tr className="text-left text-sm text-gray-500 bg-gray-50">
+                  <th className="py-3 px-2 w-16 border-b"></th>
+                  <th className="py-3 px-2 w-40 border-b">股票代码/名称</th>
+                  <th className="py-3 px-2 w-24 border-b">持仓数量</th>
+                  <th className="py-3 px-2 w-32 border-b">持仓金额 (元)</th>
+                  <th className="py-3 px-2 w-24 border-b">每手股数</th>
+                  <th className="py-3 px-2 border-b">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((entry, index) => (
+                  <tr key={index} className="border-b hover:bg-gray-50">
+                    {/* 移动按钮列 */}
+                    <td className="py-3 px-2">
+                      <div className="flex gap-1">
+                        {index > 0 && (
+                          <button
+                            onClick={() => handleMoveUp(index)}
+                            className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                            title="上移"
+                          >
+                            <ChevronUpIcon className="w-5 h-5" />
+                          </button>
+                        )}
+                        {index < entries.length - 1 && (
+                          <button
+                            onClick={() => handleMoveDown(index)}
+                            className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                            title="下移"
+                          >
+                            <ChevronDownIcon className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* 股票代码与名称列 */}
+                    <td className="py-3 px-2">
+                      <span className="text-gray-900 font-medium">
+                        {entry.code}
+                      </span>
+                      {stockDetailsMap[entry.code.toLowerCase()] && (
+                        <span className="text-gray-500 ml-1">
+                          ({stockDetailsMap[entry.code.toLowerCase()].name})
+                        </span>
+                      )}
+                    </td>
+
+                    {/* 持仓数量列 */}
+                    <td className="py-3 px-2">
+                      {editIndex === index ? (
+                        <input
+                          type="number"
+                          value={editCount}
+                          onChange={(e) => setEditCount(e.target.value)}
+                          className="w-full px-2 py-1 border rounded text-gray-900"
+                          min="0"
+                          placeholder="持仓数量"
+                        />
+                      ) : (
+                        <span className="text-gray-600">
+                          ({entry.count || 0}手)
+                        </span>
+                      )}
+                    </td>
+
+                    {/* 持仓金额列 */}
+                    <td className="py-3 px-2">
+                      <span className="text-gray-600">
+                        {editIndex === index
+                          ? calculatePositionValue(
+                              entry.code,
+                              editCount ? parseInt(editCount) : undefined
+                            )
+                          : calculatePositionValue(entry.code, entry.count)}
+                      </span>
+                    </td>
+
+                    {/* 每手股数列 */}
+                    <td className="py-3 px-2">
+                      <span className="text-gray-500">
+                        {stockDetailsMap[entry.code.toLowerCase()]?.lotSize
+                          ? `${
+                              stockDetailsMap[entry.code.toLowerCase()].lotSize
+                            }股/手`
+                          : "100股/手"}
+                      </span>
+                    </td>
+
+                    {/* 操作按钮列 */}
+                    <td className="py-3 px-2">
+                      <div className="flex gap-2">
+                        {editIndex === index ? (
+                          <>
+                            <button
+                              onClick={() => handleSaveEdit(index)}
+                              className="px-3 py-1 text-sm text-gray-700 hover:text-gray-900 border border-gray-300 rounded"
+                            >
+                              保存
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded"
+                            >
+                              取消
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() =>
+                                handleStartEdit(index, entry.count)
+                              }
+                              className="px-3 py-1 text-sm border border-gray-300 bg-gray-50 text-gray-700 rounded hover:bg-gray-100 hover:border-gray-400"
+                            >
+                              编辑
+                            </button>
+                            <button
+                              onClick={() => handleDelete(index)}
+                              className="px-3 py-1 text-sm border border-red-200 bg-red-50 text-red-500 rounded hover:bg-red-100 hover:border-red-300"
+                            >
+                              删除
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
-          {entries.length > 0 &&
-            entries.map((entry, index) => (
-              <div key={index} className="flex items-center gap-2 mb-3 py-2">
-                {/* 移动按钮列 */}
-                <div className="flex gap-1 w-16">
-                  {index > 0 && (
-                    <button
-                      onClick={() => handleMoveUp(index)}
-                      className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-                      title="上移"
-                    >
-                      <ChevronUpIcon className="w-5 h-5" />
-                    </button>
-                  )}
-                  {index < entries.length - 1 && (
-                    <button
-                      onClick={() => handleMoveDown(index)}
-                      className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-                      title="下移"
-                    >
-                      <ChevronDownIcon className="w-5 h-5" />
-                    </button>
-                  )}
-                </div>
-
-                {/* 股票代码与名称列 */}
-                <div className="w-40">
-                  <span className="text-gray-900 font-medium">
-                    {entry.code}
-                  </span>
-                  {stockDetailsMap[entry.code.toLowerCase()] && (
-                    <span className="text-gray-500 ml-1">
-                      ({stockDetailsMap[entry.code.toLowerCase()].name})
-                    </span>
-                  )}
-                </div>
-
-                {/* 持仓数量列 */}
-                <div className="w-24">
-                  {editIndex === index ? (
-                    <input
-                      type="number"
-                      value={editCount}
-                      onChange={(e) => setEditCount(e.target.value)}
-                      className="w-full px-2 py-1 border rounded text-gray-900"
-                      min="0"
-                      placeholder="持仓数量"
-                    />
-                  ) : (
-                    <span className="text-gray-600">
-                      ({entry.count || 0}手)
-                    </span>
-                  )}
-                </div>
-
-                {/* 持仓金额列 */}
-                <div className="w-32">
-                  <span className="text-gray-600">
-                    {editIndex === index
-                      ? calculatePositionValue(
-                          entry.code,
-                          editCount ? parseInt(editCount) : undefined
-                        )
-                      : calculatePositionValue(entry.code, entry.count)}
-                  </span>
-                </div>
-
-                {/* 每手股数列 */}
-                <div className="w-24">
-                  <span className="text-gray-500">
-                    {stockDetailsMap[entry.code.toLowerCase()]?.lotSize
-                      ? `${
-                          stockDetailsMap[entry.code.toLowerCase()].lotSize
-                        }股/手`
-                      : "100股/手"}
-                  </span>
-                </div>
-
-                {/* 操作按钮列 */}
-                <div className="flex gap-2">
-                  {editIndex === index ? (
-                    <>
-                      <button
-                        onClick={() => handleSaveEdit(index)}
-                        className="px-3 py-1 text-sm text-gray-700 hover:text-gray-900 border border-gray-300 rounded"
-                      >
-                        保存
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded"
-                      >
-                        取消
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => handleStartEdit(index, entry.count)}
-                        className="px-3 py-1 text-sm border border-gray-300 bg-gray-50 text-gray-700 rounded hover:bg-gray-100 hover:border-gray-400"
-                      >
-                        编辑
-                      </button>
-                      <button
-                        onClick={() => handleDelete(index)}
-                        className="px-3 py-1 text-sm border border-red-200 bg-red-50 text-red-500 rounded hover:bg-red-100 hover:border-red-300"
-                      >
-                        删除
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
         </div>
 
-        <div className="flex gap-2 mb-6 border-t pt-4">
-          <input
-            type="text"
-            value={newCode}
-            onChange={(e) => setNewCode(e.target.value)}
-            placeholder="代码(sz000001)"
-            className="px-2 py-1 border rounded text-gray-900 w-36"
-          />
-          <input
-            type="number"
-            value={newCount}
-            onChange={(e) => setNewCount(e.target.value)}
-            placeholder="持仓数量(手)"
-            className="px-2 py-1 border rounded w-32 text-gray-900"
-            min="0"
-          />
-          <button
-            onClick={handleAdd}
-            className="px-4 py-1 bg-gray-800 text-white rounded hover:bg-gray-700"
-          >
-            添加
-          </button>
+        <div className="mt-6 border-t pt-4">
+          <h3 className="font-bold mb-3 text-gray-900">添加新股票：</h3>
+          <div className="flex items-center gap-3">
+            <div>
+              <label
+                htmlFor="stockCode"
+                className="block text-sm text-gray-600 mb-1"
+              >
+                股票代码
+              </label>
+              <input
+                id="stockCode"
+                type="text"
+                value={newCode}
+                onChange={(e) => setNewCode(e.target.value)}
+                placeholder="代码(sz000001)"
+                className="px-3 py-2 border rounded text-gray-900 w-40"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="stockCount"
+                className="block text-sm text-gray-600 mb-1"
+              >
+                持仓数量(手)
+              </label>
+              <input
+                id="stockCount"
+                type="number"
+                value={newCount}
+                onChange={(e) => setNewCount(e.target.value)}
+                placeholder="持仓数量"
+                className="px-3 py-2 border rounded w-40 text-gray-900"
+                min="0"
+              />
+            </div>
+            <div className="self-end">
+              <button
+                onClick={handleAdd}
+                className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+              >
+                添加股票
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="flex justify-start gap-2 mt-8">
+        <div className="flex justify-start gap-3 mt-8 pt-4 border-t">
           <a
             href="/realtime"
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+            className="px-5 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
           >
             返回实时数据
           </a>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium"
           >
             保存更改
           </button>
