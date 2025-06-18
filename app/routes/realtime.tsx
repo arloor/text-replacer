@@ -20,7 +20,7 @@ const INTERVAL_IN_MILLISECONDS = 3000; // 3秒
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "实时数据 | 股票监控" },
+    { title: "数据" },
     { name: "description", content: "实时监控股票数据，获取最新行情变化。" },
   ];
 };
